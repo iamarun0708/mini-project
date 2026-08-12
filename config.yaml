@@ -1,0 +1,108 @@
+# ============================================================================
+# Systematic Study of Model Merging in Small Language Models
+# Single source of truth for paths, seeds, hyperparameters, model revision.
+# ============================================================================
+
+# ---- Reproducibility -------------------------------------------------------
+seed: 42                      # applied to torch, numpy, random, transformers.set_seed
+
+# ---- Base model ------------------------------------------------------------
+model:
+  repo_id: Qwen/Qwen2.5-1.5B-Instruct     # 1.5B params (< 3B), open weights, no gating
+  local_dir: ./models/qwen2.5-1.5b-instruct
+  # CRITICAL: pin the exact commit so adapters train & merge against ONE snapshot.
+  # Filled by scripts/download_model after `hf download --revision main`.
+  revision: 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+  dtype: bfloat16             # bf16 LoRA, NOT QLoRA — avoid quantization noise in the merge study
+
+# ---- Hardware notes --------------------------------------------------------
+# Actual GPU: RTX 4070 Laptop, 8 GB VRAM (spec assumed 12 GB).
+# Adaptation follows the spec rule: reduce batch, raise grad-accum, DO NOT switch models.
+# Effective batch is held at 32 (2 * 16) to match the spec's intent (4 * 8).
+hardware:
+  vram_gb: 8
+  gpu: "NVIDIA GeForce RTX 4070 Laptop"
+
+# ---- LoRA (identical across ALL four adapters — several merge methods need matching shapes)
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+  bias: none
+
+# ---- Training (identical across ALL four adapters — any per-task change is a confound)
+training:
+  epochs: 2
+  lr: 2.0e-4
+  scheduler: cosine
+  warmup_ratio: 0.03
+  per_device_batch_size: 2          # spec: 4 @ 12GB  ->  2 @ 8GB
+  gradient_accumulation_steps: 16   # spec: 8         -> 16   (effective batch stays 32)
+  max_seq_len: 1024
+  bf16: true
+  gradient_checkpointing: true
+  seed: 42
+  logging_steps: 10
+  save_strategy: "epoch"
+
+# ---- Data ------------------------------------------------------------------
+data:
+  max_train_examples: 8000          # equal data budget per task — controlled comparison
+  eval_items: 300                   # held-out per task
+  processed_dir: ./data/processed
+  sources:
+    sql:
+      hf_dataset: b-mc2/sql-create-context
+    math:
+      hf_dataset: gsm8k
+      config: main
+    translation:
+      # Ta->En. Train: samanantar ta subset. Eval: FLORES-200 ta->en devtest.
+      train_hf_dataset: ai4bharat/samanantar
+      train_config: ta
+      eval_hf_dataset: facebook/flores
+      eval_config: tam_Taml-eng_Latn
+    json:
+      # fully synthetic, deterministic from `seed`
+      n_schemas: 10
+
+# ---- Tasks: instruction strings + generation caps --------------------------
+# The prompt TEMPLATE is shared & identical (see train/prompt_templates.py).
+# Only `instruction` differs between tasks. This is the load-bearing control.
+tasks:
+  sql:
+    instruction: "Given a database schema and a question, write a single SQL query that answers it. Output only the SQL."
+    max_new_tokens: 128
+  math:
+    instruction: "Solve the following math problem. Think step by step, then give the final numeric answer."
+    max_new_tokens: 256
+  translation:
+    instruction: "Translate the following Tamil text into English. Output only the English translation."
+    max_new_tokens: 128
+  json:
+    instruction: "Extract the requested information from the text and output it as a single JSON object matching the given schema. Output only the JSON."
+    max_new_tokens: 256
+
+# ---- Evaluation ------------------------------------------------------------
+eval:
+  do_sample: false                  # greedy everywhere — reproducibility over peak scores
+  batch_size: 16                    # generation batch (tune down if OOM)
+  results_dir: ./results
+
+# ---- Merging ---------------------------------------------------------------
+merge:
+  adapters_dir: ./adapters
+  peft_methods: [linear, ties, dare_ties, dare_linear, magnitude_prune]
+  # grid: 6 pairs + 4 triples + 1 quad = 11 combos x 5 methods = 55 merged models
+  #       + base + 4 individual adapters = 5 control rows
+  coefficient_sweep:
+    weights: [[0.3, 0.7], [0.5, 0.5], [0.7, 0.3]]   # pairs only, 2 best methods
+  mergekit:
+    # secondary weight-space cross-check on ~10 configs
+    methods: [task_arithmetic, ties]
+
+# ---- Deployment ------------------------------------------------------------
+deploy:
+  gguf_dir: ./deploy
+  quantization: Q4_K_M

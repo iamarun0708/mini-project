@@ -1,0 +1,8 @@
+models/
+adapters/
+data/processed/
+.venv/
+__pycache__/
+*.pyc
+*.gguf
+llama.cpp/

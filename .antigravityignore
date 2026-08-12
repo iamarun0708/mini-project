@@ -1,0 +1,35 @@
+# Antigravity Ignore — keep heavy/generated dirs out of context
+# Same purpose as .claudeignore but for the Antigravity IDE agent.
+
+# Python virtual environment (~5.9 GB)
+.venv/
+
+# Downloaded base model (~2.9 GB)
+models/
+
+# Trained adapter weights (large safetensors files)
+adapters/*/adapter_model.safetensors
+adapters/*/checkpoint-*/
+
+# Tokenizer files (duplicated from base model into each adapter)
+adapters/*/tokenizer.json
+
+# Processed data files (generated, can be reproduced)
+data/processed/*.jsonl
+
+# Python caches
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.pyc
+
+# Results and generated outputs
+results/**/*.json
+results/**/*.csv
+
+# GGUF deploy artifacts
+deploy/*.gguf
+
+# System files
+.git/
+*.egg-info/

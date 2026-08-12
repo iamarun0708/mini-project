@@ -1,0 +1,22 @@
+# Paths Claude Code should not crawl or read — heavy, generated, or vendored.
+# Keeps startup and searches focused on source (config.yaml, common.py, eval/, train/, etc).
+# Read CLAUDE.md first for project state.
+
+# Virtualenv (~5.9G) — third-party site-packages, never edit here
+.venv/
+
+# Base model weights & HF cache (~2.9G) — binary, pinned by config.model.revision
+models/
+
+# Generated artifacts (produced by the pipeline, not source)
+adapters/
+merge/
+results/
+analysis/
+deploy/
+data/processed/
+
+# Python bytecode / caches
+__pycache__/
+*.pyc
+*.gguf
