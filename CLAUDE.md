@@ -46,9 +46,9 @@ and applies global seeding (seed 42) + train/eval overlap hashing.
 | 1. Download + pin base model | `scripts_download_model.py` | ✅ done — model present, revision pinned |
 | 2. Scorers | `eval/scorers/{sql,math,translation,json_extract}.py` | ✅ done — gate `python -m eval.test_scorers` passes 24/24 |
 | 3. Data preparation | `data/prepare.py` | ✅ done — all 4 datasets in `data/processed/` |
-| 4. Train LoRA adapters | `train/run.py` → `adapters/` | 🟡 2/4 — SQL (loss 0.019) + JSON (loss 7.5e-06) done, math/translation todo |
-| 5. Eval runner | `eval/` | ⬜ todo → `results/` |
-| 6. Merge grid | `merge/` | ⬜ todo — see config.merge (55 merged + 5 control) |
+| 4. Train LoRA adapters | `train/run.py` → `adapters/` | ✅ 4/4 — sql 0.0186, math 0.2713, translation 1.8395, json 7.53e-06 (all @ epoch 2.0) |
+| 5. Eval runner | `eval/` | ⬜ todo → `results/` — **the bottleneck**, see below |
+| 6. Merge grid | `merge/` → `merged/` | ✅ built — all 55 present (3.8 GB), distinct, geometry-checked |
 | 7. Analysis | `analysis/` | ⬜ todo |
 | 8. GGUF deploy | `deploy/` | ⬜ todo — Q4_K_M |
 
@@ -64,14 +64,72 @@ and applies global seeding (seed 42) + train/eval overlap hashing.
   with the FLORES license accepted. Old script-based mirrors are dead in datasets 5.0;
   the non-gated all-pairs parquet mirror is enormous (36 shards).
 
-## OPEN DECISION — translation eval set (blocks only the translation eval, nothing else)
+## RESOLVED — translation eval set
 
-Was asked, not yet resolved. Pick one before building the translation eval:
-1. **User provides HF token** (accept FLORES license, set `HF_TOKEN` / `hf auth login`),
-   then use `facebook/flores` `tam_Taml-eng_Latn` devtest exactly — most faithful.
-2. **Hold out a disjoint, seed-deterministic slice of samanantar ta** — non-gated,
-   reproducible, but same-distribution as train (weaker than a clean benchmark).
-3. **Another public Ta→En test set** — external like FLORES but unverified quality.
+Settled as **option 2**: a disjoint, seed-deterministic slice of samanantar `ta`.
+`data/prepare.py` never touches FLORES. Consequence for the paper (§VIII-C): the
+eval set is same-distribution as train, so absolute chrF++ is optimistic. Every
+model in the grid is scored on the same set, so the *relative* method comparison
+is preserved — but absolute translation numbers must not be read as benchmark
+results.
+
+## Merge stage (§V) — how it works
+
+`merge/grid.py` is pure enumeration (no torch): 6 pairs + 4 triples + 1 quad = 11
+combos, x 5 methods = 55. `merge/build.py` does the work via PEFT
+`add_weighted_adapter`, which supports all five of config's methods natively.
+
+- **Cheap and GPU-free.** Merging is arithmetic on the rank-16 A/B factors
+  (~71 MB each), not the 2.9 GB base. The base loads on CPU only because PEFT
+  needs the module structure. Full 55-model grid = **~1 min**.
+- **DARE is stochastic.** `dare_ties` / `dare_linear` drop entries at random, so
+  every merge reseeds torch from `hash(seed, method, combo, weights)` before
+  calling PEFT. Verified byte-reproducible across rebuilds, and independent of
+  build order. The other three methods are deterministic.
+- **Staged writes.** Output goes to `.<id>.partial` then moves into place, so an
+  interrupted build never leaves a dir that `--resume` would count as finished.
+- **Geometry gate.** Refuses to run unless all four specialists share identical
+  `r / alpha / dropout / bias / target_modules`.
+- `merged/` is gitignored (3.8 GB). Rebuild with `python -m merge.build`.
+
+**Caveat to state in the paper:** PEFT's non-SVD `ties`/`dare_ties` elect signs on
+the LoRA **A and B factors separately**, not on the composed delta
+`(alpha/r)·B@A`. Standard PEFT behaviour, but §V currently describes it as acting
+on the delta. Either reword, or switch to the `*_svd` variants. This caveat is
+recorded in every `merged/*/merge_meta.json`.
+
+Two merge parameters the paper does not specify are now pinned in config:
+`merge.density: 0.5` (retained fraction, held identical across all pruning
+methods so the comparison is not confounded) and `merge.majority_sign_method:
+total`. Observed nonzero fractions: linear 100%, TIES 68.7%, DARE-TIES 93.8%.
+
+## Eval plan (stage 5, not yet built)
+
+~60 models x 4 tasks x 300 items = **72k greedy generations, est. 20–40 h** on the
+8 GB card. Design agreed:
+
+- **Shard unit = one (model, task) cell** (300 gens, ~5–10 min). 240 cells total.
+  `--shard k/N` slices the cell list; `--resume` skips finished cells.
+- **Persist per-item predictions, aggregate late.** chrF++ is corpus-level and
+  cannot be averaged across shards; JSON micro-F1 pools tp/fp/fn globally. Storing
+  per-item records and calling `score_corpus` once at aggregation makes *any*
+  sharding scheme exact.
+- **Run the 5 control rows first** (20 cells, ~2 h). Specialist scores are the
+  denominator of R_i = s_i(θ_M)/s_i(θ_i) — no retention number exists until they do.
+- Add `--limit N` and time one cell per task before committing to a schedule; the
+  20–40 h figure is extrapolation, not measurement. `math`/`json` allow 256 new
+  tokens vs 128 for `sql`/`translation`, so expect ~2x spread by task.
+- JSON scorer wants a `schema` in `extra`, but the eval JSONL embeds the schema
+  inside the `input` text — the runner must parse it back out.
+
+## Known blockers for later stages
+
+- **`llama.cpp` absent** → stage 8 (GGUF Q4_K_M) cannot run until it is cloned/built.
+- **mergekit cross-check** (~10 configs) merges *full checkpoints*, not adapters:
+  ~3.1 GB each, **~31 GB** disk. 382 GB free, so fine, but it is not the cheap path
+  that the PEFT grid is.
+- **Coefficient sweep** is built by `merge/build.py --sweep --methods a,b`, but the
+  "top 2 methods" are unknown until eval runs — deliberately not hardcoded.
 
 SQL / math / json data prep is fully unblocked regardless of this choice.
 

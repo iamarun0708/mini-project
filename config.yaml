@@ -92,8 +92,16 @@ eval:
 
 # ---- Merging ---------------------------------------------------------------
 merge:
-  adapters_dir: ./adapters
+  adapters_dir: ./adapters          # INPUT: the four task specialists
+  output_dir: ./merged              # OUTPUT: one dir per merged model
   peft_methods: [linear, ties, dare_ties, dare_linear, magnitude_prune]
+  # Fraction of delta entries RETAINED by the pruning-based methods
+  # (ties, dare_ties, dare_linear, magnitude_prune). `linear` ignores it.
+  # NOT specified in the paper. Held IDENTICAL across all four pruning methods so
+  # that the method comparison is not confounded by a per-method density choice.
+  density: 0.5
+  # TIES sign election: "total" weighs by summed magnitude, "frequency" by count.
+  majority_sign_method: total
   # grid: 6 pairs + 4 triples + 1 quad = 11 combos x 5 methods = 55 merged models
   #       + base + 4 individual adapters = 5 control rows
   coefficient_sweep:
