@@ -1,0 +1,17 @@
+{
+  "model_id": "json",
+  "task": "translation",
+  "metrics": {
+    "chrf++": 16.372613507042555,
+    "n": 300
+  },
+  "n_items": 300,
+  "limited": false,
+  "gen_seconds": 49.5,
+  "secs_per_item": 0.17,
+  "max_new_tokens": 128,
+  "batch_size": 16,
+  "do_sample": false,
+  "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42
+}

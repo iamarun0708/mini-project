@@ -1,0 +1,20 @@
+{
+  "model_id": "math",
+  "task": "json",
+  "metrics": {
+    "schema_valid_rate": 1.0,
+    "field_f1": 0.9462365591397849,
+    "field_precision": 0.9528228924980665,
+    "field_recall": 0.9397406559877955,
+    "n": 300
+  },
+  "n_items": 300,
+  "limited": false,
+  "gen_seconds": 35.6,
+  "secs_per_item": 0.12,
+  "max_new_tokens": 256,
+  "batch_size": 16,
+  "do_sample": false,
+  "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42
+}

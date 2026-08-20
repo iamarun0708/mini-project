@@ -1,0 +1,17 @@
+{
+  "model_id": "math",
+  "task": "translation",
+  "metrics": {
+    "chrf++": 18.510072269518872,
+    "n": 300
+  },
+  "n_items": 300,
+  "limited": false,
+  "gen_seconds": 47.6,
+  "secs_per_item": 0.16,
+  "max_new_tokens": 128,
+  "batch_size": 16,
+  "do_sample": false,
+  "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42
+}

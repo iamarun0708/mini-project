@@ -1,0 +1,20 @@
+{
+  "model_id": "sql",
+  "task": "json",
+  "metrics": {
+    "schema_valid_rate": 0.9933333333333333,
+    "field_f1": 0.9646968534151958,
+    "field_precision": 0.9646968534151957,
+    "field_recall": 0.9646968534151957,
+    "n": 300
+  },
+  "n_items": 300,
+  "limited": false,
+  "gen_seconds": 32.0,
+  "secs_per_item": 0.11,
+  "max_new_tokens": 256,
+  "batch_size": 16,
+  "do_sample": false,
+  "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42
+}
