@@ -1,0 +1,17 @@
+{
+  "model_id": "ties__sql-math-translation-json",
+  "task": "translation",
+  "metrics": {
+    "chrf++": 19.19708730162409,
+    "n": 300
+  },
+  "n_items": 300,
+  "limited": false,
+  "gen_seconds": 45.0,
+  "secs_per_item": 0.15,
+  "max_new_tokens": 128,
+  "batch_size": 16,
+  "do_sample": false,
+  "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42
+}
