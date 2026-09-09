@@ -1,0 +1,11 @@
+{
+  "model_id": "task_arithmetic__sql-math-translation",
+  "task": "translation",
+  "metrics": {
+    "chrf++": 20.55147163428222,
+    "n": 300
+  },
+  "n_items": 300,
+  "gen_seconds": 52.5,
+  "engine": "mergekit"
+}

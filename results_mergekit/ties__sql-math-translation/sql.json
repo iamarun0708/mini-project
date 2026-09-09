@@ -1,0 +1,12 @@
+{
+  "model_id": "ties__sql-math-translation",
+  "task": "sql",
+  "metrics": {
+    "accuracy": 0.7833333333333333,
+    "parse_failure_rate": 0.013333333333333334,
+    "n": 300
+  },
+  "n_items": 300,
+  "gen_seconds": 25.1,
+  "engine": "mergekit"
+}

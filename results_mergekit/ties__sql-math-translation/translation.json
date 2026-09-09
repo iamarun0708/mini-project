@@ -1,0 +1,11 @@
+{
+  "model_id": "ties__sql-math-translation",
+  "task": "translation",
+  "metrics": {
+    "chrf++": 23.52484864471036,
+    "n": 300
+  },
+  "n_items": 300,
+  "gen_seconds": 51.8,
+  "engine": "mergekit"
+}

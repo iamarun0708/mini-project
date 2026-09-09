@@ -1,0 +1,12 @@
+{
+  "model_id": "ties__sql-math",
+  "task": "math",
+  "metrics": {
+    "accuracy": 0.7466666666666667,
+    "unparsable_pred_rate": 0.0,
+    "n": 300
+  },
+  "n_items": 300,
+  "gen_seconds": 135.0,
+  "engine": "mergekit"
+}

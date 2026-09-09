@@ -1,0 +1,12 @@
+{
+  "model_id": "task_arithmetic__sql-math-translation",
+  "task": "math",
+  "metrics": {
+    "accuracy": 0.7333333333333333,
+    "unparsable_pred_rate": 0.0,
+    "n": 300
+  },
+  "n_items": 300,
+  "gen_seconds": 129.0,
+  "engine": "mergekit"
+}

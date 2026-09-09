@@ -1,0 +1,14 @@
+{
+  "model_id": "ties__math-json",
+  "task": "json",
+  "metrics": {
+    "schema_valid_rate": 1.0,
+    "field_f1": 1.0,
+    "field_precision": 1.0,
+    "field_recall": 1.0,
+    "n": 300
+  },
+  "n_items": 300,
+  "gen_seconds": 33.2,
+  "engine": "mergekit"
+}
