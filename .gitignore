@@ -7,3 +7,5 @@ __pycache__/
 *.gguf
 llama.cpp/
 merged/
+mergekit_out/
+deploy/_materialized/
