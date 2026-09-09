@@ -1,0 +1,33 @@
+{
+  "primary_metric": {
+    "sql": "accuracy",
+    "math": "accuracy",
+    "translation": "chrf++",
+    "json": "field_f1"
+  },
+  "specialist_scores": {
+    "sql": 0.7566666666666667,
+    "math": 0.6433333333333333,
+    "translation": 23.812298658415283,
+    "json": 1.0
+  },
+  "base_scores": {
+    "sql": 0.02666666666666667,
+    "math": 0.5633333333333334,
+    "translation": 18.12527250773955,
+    "json": 0.9519450800915333
+  },
+  "n_cells_analyzed": 144,
+  "methods_ranked_by_mean_retention": [
+    "magnitude_prune",
+    "dare_ties",
+    "linear",
+    "dare_linear",
+    "ties"
+  ],
+  "top2_methods_for_sweep": [
+    "magnitude_prune",
+    "dare_ties"
+  ],
+  "note": "R_i(M) = s_i(theta_M)/s_i(theta_i) is computed only for tasks i actually in M's merge combo. 'base' is reported for reference but excluded from method aggregates (it is not a merge product)."
+}
