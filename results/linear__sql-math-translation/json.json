@@ -1,0 +1,20 @@
+{
+  "model_id": "linear__sql-math-translation",
+  "task": "json",
+  "metrics": {
+    "schema_valid_rate": 1.0,
+    "field_f1": 0.9551895825354271,
+    "field_precision": 0.9592307692307692,
+    "field_recall": 0.9511823035850496,
+    "n": 300
+  },
+  "n_items": 300,
+  "limited": false,
+  "gen_seconds": 46.3,
+  "secs_per_item": 0.15,
+  "max_new_tokens": 256,
+  "batch_size": 16,
+  "do_sample": false,
+  "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "seed": 42
+}
