@@ -47,10 +47,10 @@ and applies global seeding (seed 42) + train/eval overlap hashing.
 | 2. Scorers | `eval/scorers/{sql,math,translation,json_extract}.py` | ✅ done — gate `python -m eval.test_scorers` passes 24/24 |
 | 3. Data preparation | `data/prepare.py` | ✅ done — all 4 datasets in `data/processed/` |
 | 4. Train LoRA adapters | `train/run.py` → `adapters/` | ✅ 4/4 — sql 0.0186, math 0.2713, translation 1.8395, json 7.53e-06 (all @ epoch 2.0) |
-| 5. Eval runner | `eval/` | ⬜ todo → `results/` — **the bottleneck**, see below |
-| 6. Merge grid | `merge/` → `merged/` | ✅ built — all 55 present (3.8 GB), distinct, geometry-checked |
-| 7. Analysis | `analysis/` | ⬜ todo |
-| 8. GGUF deploy | `deploy/` | ⬜ todo — Q4_K_M |
+| 5. Eval runner | `eval/run.py` → `results/` | ✅ done — 280 cells scored (96 result dirs) |
+| 6. Merge grid | `merge/` → `merged/` | ✅ done — 55 PEFT + 36 sweep + 10 mergekit, all geometry-checked |
+| 7. Analysis | `analysis/report.py` | ✅ done — CSVs, plots, summary.json, FINDINGS.md |
+| 8. GGUF deploy | `deploy/build.py` | ✅ done — magnitude_prune__sql-math-translation-json-Q4_K_M.gguf (941 MB) |
 
 ## Verified data sources (probed live 2026-07-22, unauthenticated)
 
@@ -103,35 +103,29 @@ Two merge parameters the paper does not specify are now pinned in config:
 methods so the comparison is not confounded) and `merge.majority_sign_method:
 total`. Observed nonzero fractions: linear 100%, TIES 68.7%, DARE-TIES 93.8%.
 
-## Eval plan (stage 5, not yet built)
+## Eval runner (stage 5, complete)
 
-~60 models x 4 tasks x 300 items = **72k greedy generations, est. 20–40 h** on the
-8 GB card. Design agreed:
+`eval/run.py` scored 280 cells (96 model dirs × relevant tasks × 300 items each).
+Per-item predictions stored in `results/<model_id>/<task>.preds.jsonl`; aggregate
+scores in `results/<model_id>/<task>.json`. Supports `--resume` and `--shard k/N`.
 
-- **Shard unit = one (model, task) cell** (300 gens, ~5–10 min). 240 cells total.
-  `--shard k/N` slices the cell list; `--resume` skips finished cells.
-- **Persist per-item predictions, aggregate late.** chrF++ is corpus-level and
-  cannot be averaged across shards; JSON micro-F1 pools tp/fp/fn globally. Storing
-  per-item records and calling `score_corpus` once at aggregation makes *any*
-  sharding scheme exact.
-- **Run the 5 control rows first** (20 cells, ~2 h). Specialist scores are the
-  denominator of R_i = s_i(θ_M)/s_i(θ_i) — no retention number exists until they do.
-- Add `--limit N` and time one cell per task before committing to a schedule; the
-  20–40 h figure is extrapolation, not measurement. `math`/`json` allow 256 new
-  tokens vs 128 for `sql`/`translation`, so expect ~2x spread by task.
-- JSON scorer wants a `schema` in `extra`, but the eval JSONL embeds the schema
-  inside the `input` text — the runner must parse it back out.
+## Key results
 
-## Known blockers for later stages
+- **Best method:** `magnitude_prune` (mean retention 0.991, median 0.999)
+- **Deployed model:** `magnitude_prune__sql-math-translation-json` at 0.960 mean retention
+- **Fragile tasks:** SQL (most affected by merging), Translation (hurt by TIES specifically)
+- **Robust tasks:** Math and JSON (essentially unaffected by any method)
+- **Coefficient sweep:** Equal weights (0.5/0.5) beat skewed weights
+- **Mergekit cross-check:** Pearson r=0.48, directional agreement but magnitude differences
 
-- **`llama.cpp` absent** → stage 8 (GGUF Q4_K_M) cannot run until it is cloned/built.
-- **mergekit cross-check** (~10 configs) merges *full checkpoints*, not adapters:
-  ~3.1 GB each, **~31 GB** disk. 382 GB free, so fine, but it is not the cheap path
-  that the PEFT grid is.
-- **Coefficient sweep** is built by `merge/build.py --sweep --methods a,b`, but the
-  "top 2 methods" are unknown until eval runs — deliberately not hardcoded.
+See `FINDINGS.md` for the full recommendation report.
 
-SQL / math / json data prep is fully unblocked regardless of this choice.
+## All blockers resolved
+
+- **`llama.cpp`** cloned and built → `llama.cpp/build/bin/Release/`
+- **mergekit cross-check** completed on 10-model slice → `results_mergekit/`
+- **Coefficient sweep** completed for top 2 methods (magnitude_prune, dare_ties)
+- **Dashboard:** `index.html` — open in browser to view interactive analysis
 
 ## How to run things
 

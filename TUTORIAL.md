@@ -75,28 +75,42 @@ http://127.0.0.1:8090
 
 ---
 
-## Part B — Browse the research results
+## Part B — Browse the research results (Analysis Dashboard)
 
-**Step 1.** Open the dashboard link:
+**Step 1.** Open the local dashboard in your browser:
 
-[Retention Grid](https://claude.ai/code/artifact/067b6905-1d3a-4551-bdb9-c48ba46f0863)
+```
+c:\Users\12403\Pictures\mini-project\index.html
+```
 
-**Step 2.** Read the top strip — confirms every pipeline stage finished.
+Or double-click `index.html` in the project folder.
 
-**Step 3.** Check the highlighted card — this is the exact model the chat
-frontend in Part A is running.
+**Step 2.** Read the top hero section — confirms the study is complete and
+shows the two key questions answered.
 
-**Step 4.** Scroll to the bar chart — compares the five merge methods by how
-much task performance they keep after merging.
+**Step 3.** Check the **verdict cards** — Q1 (Is the model suitable for
+fine-tuning?) and Q2 (Is it suitable for merging?). Both are YES.
 
-**Step 5.** Scroll to the line chart — shows performance drops as more tasks
-get merged into one model.
+**Step 4.** Review the **training results table** — before vs. after scores
+for all four tasks, showing the fine-tuning improvements.
 
-**Step 6.** Scroll to the scatter plot — a sanity check comparing two
-different merge implementations against each other.
+**Step 5.** Check the **method ranking** — all five merge methods ranked by
+mean retention, with magnitude_prune as the clear winner.
 
-**Step 7.** Use the table at the bottom — click any column header to sort,
-use the dropdowns to filter by method or number of tasks merged.
+**Step 6.** Scroll to the **charts section**:
+- Bar chart: mean retention by method
+- Line chart: retention degradation as arity increases
+- Grouped bar: per-task retention by method
+- Coefficient sweep: equal weights vs. skewed weights
+
+**Step 7.** Review **task fragility table** — which tasks are robust to
+merging (JSON, Math) and which are fragile (SQL, Translation).
+
+**Step 8.** Check the **cross-check section** — PEFT vs. Mergekit agreement
+scatter plot with Pearson r = 0.48.
+
+**Step 9.** Read the **recommendations** — actionable advice for choosing
+merge methods, weights, and expectations.
 
 ---
 

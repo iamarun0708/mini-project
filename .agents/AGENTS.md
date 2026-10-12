@@ -45,10 +45,10 @@ the pinned model revision. `common.py` loads it and applies global seeding (seed
 | 4b. Train math adapter | `train/run.py --task math` | ✅ done → `adapters/math/` (loss 0.271) |
 | 4c. Train translation adapter | `train/run.py --task translation` | ✅ done → `adapters/translation/` (loss 1.84) |
 | 4d. Train json adapter | `train/run.py --task json` | ✅ done → `adapters/json/` (loss 7.5e-06) |
-| 5. Eval runner | `eval/` | ⬜ todo — scorers exist, need runner script |
-| 6. Merge grid | `merge/` | ⬜ todo — 55 merged + 5 control models |
-| 7. Analysis | `analysis/` | ⬜ todo |
-| 8. GGUF deploy | `deploy/` | ⬜ todo — Q4_K_M |
+| 5. Eval runner | `eval/run.py` | ✅ done — 280 cells scored, results in `results/` |
+| 6. Merge grid | `merge/build.py` | ✅ done — 55 PEFT + 36 sweep + 10 mergekit |
+| 7. Analysis | `analysis/report.py` | ✅ done — CSVs, plots, summary.json, FINDINGS.md |
+| 8. GGUF deploy | `deploy/build.py` | ✅ done — Q4_K_M (941 MB) |
 
 ## Data files (in `data/processed/`)
 
@@ -81,6 +81,7 @@ Each JSONL record has: `{"task", "instruction", "input", "output"}`
 - `prepare.py` — downloads HF datasets + generates synthetic JSON, splits train/eval
 
 ### `eval/`
+- `run.py` — evaluation runner, 280 cells scored
 - `scorers/sql.py` — AST equivalence via sqlglot
 - `scorers/math.py` — final number extraction + numeric comparison
 - `scorers/translation.py` — chrF++ via sacrebleu (corpus-level)
@@ -88,26 +89,44 @@ Each JSONL record has: `{"task", "instruction", "input", "output"}`
 - `scorers/_util.py` — shared cleaning (fence stripping, im_end removal)
 - `test_scorers.py` — 24-check gate, run with `.venv/bin/python -m eval.test_scorers`
 
+### `merge/`
+- `grid.py` — pure enumeration: 6 pairs + 4 triples + 1 quad = 11 combos
+- `build.py` — PEFT merge engine (55 models + coefficient sweep)
+- `mergekit_crosscheck.py` — independent full-checkpoint merge (10 configs)
+- `mergekit_eval.py` — evaluation for mergekit merged models
+
+### `analysis/`
+- `report.py` — retention analysis, generates CSVs and summary.json
+- `sweep_report.py` — coefficient sweep analysis
+- `*.csv` — by_method, by_arity, by_method_task, retention, sweep_retention, mergekit_vs_peft
+- `summary.json` — machine-readable key findings
+- `plots/` — retention_by_method.png, retention_by_arity.png
+
+### `deploy/`
+- `build.py` — GGUF conversion + quantization script
+- `magnitude_prune__sql-math-translation-json-Q4_K_M.gguf` — deployed model (941 MB)
+
+### `results/`
+- 96 model directories, each containing `<task>.json` (aggregate scores) and `<task>.preds.jsonl` (per-item predictions)
+
 ### `adapters/`
 - `sql/` — ✅ trained adapter (adapter_config.json + adapter_model.safetensors)
-- `math/` — ✅ trained adapter (adapter_config.json + adapter_model.safetensors)
-- `translation/` — ✅ trained adapter (adapter_config.json + adapter_model.safetensors)
-- `json/` — ✅ trained adapter (adapter_config.json + adapter_model.safetensors)
+- `math/` — ✅ trained adapter
+- `translation/` — ✅ trained adapter
+- `json/` — ✅ trained adapter
 
-### Empty dirs (to be populated)
-- `merge/` — merge scripts
-- `analysis/` — analysis scripts
-- `results/` — eval output
-- `deploy/` — GGUF models
+### Root
+- `index.html` — interactive analysis dashboard (open in browser)
+- `FINDINGS.md` — full recommendation report
+- `TUTORIAL.md` — reproduction guide
 
-## How to continue
+## Project status: COMPLETE
 
-All 4 adapters are trained. The remaining stages are:
+All 8 pipeline stages are done. The project is finished.
 
-1. **Build `eval/run.py`** — evaluation runner using existing scorers
-2. **Build `merge/run.py`** — merge grid (5 methods × 11 combos = 55 merged + 5 controls)
-3. **Build `analysis/`** — results tables + plots
-4. **Build `deploy/`** — GGUF conversion (Q4_K_M)
+- **Best method:** `magnitude_prune` (mean retention 0.991)
+- **Deployed model:** `magnitude_prune__sql-math-translation-json-Q4_K_M.gguf`
+- **Dashboard:** Open `index.html` in a browser
 
 ```bash
 # Verify scorers still pass:

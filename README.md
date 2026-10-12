@@ -65,10 +65,27 @@ q/k/v/o/gate/up/down projections — a requirement for weight-space merging.
 │   ├── translation/
 │   └── json/
 │
-├── merge/                   # Merge scripts (planned)
-├── analysis/                # Analysis & visualization (planned)
-├── results/                 # Evaluation output (planned)
-├── deploy/                  # GGUF quantized models (planned)
+├── merge/
+│   ├── grid.py              # Combo enumeration (6 pairs + 4 triples + 1 quad)
+│   ├── build.py             # PEFT merge engine (55 models + sweep)
+│   ├── mergekit_crosscheck.py  # Independent full-checkpoint cross-check
+│   └── mergekit_eval.py     # Evaluation for mergekit models
+│
+├── analysis/
+│   ├── report.py            # Retention analysis & CSV generation
+│   ├── sweep_report.py      # Coefficient sweep analysis
+│   ├── *.csv                # by_method, by_arity, by_method_task, retention, sweep, mergekit_vs_peft
+│   ├── summary.json         # Key findings in machine-readable format
+│   └── plots/               # Generated visualizations
+│
+├── results/                 # Evaluation output (96 model dirs, each with .json + .preds.jsonl)
+├── merged/                  # 55 merged + sweep + control models (3.8 GB)
+├── deploy/
+│   └── magnitude_prune__sql-math-translation-json-Q4_K_M.gguf  # Deployed model (941 MB)
+│
+├── index.html               # Analysis dashboard (open in browser)
+├── FINDINGS.md              # Research findings & recommendations
+├── TUTORIAL.md              # Step-by-step reproduction guide
 │
 ├── models/
 │   └── qwen2.5-1.5b-instruct/  # Pinned base model snapshot
@@ -94,23 +111,26 @@ graph LR
 | Download & pin base model | ✅ Complete |
 | Prepare datasets | ✅ Complete |
 | Train all 4 adapters | ✅ Complete |
-| Build evaluation runner | ⬜ Planned |
-| Merge grid (55 merged + 5 controls) | ⬜ Planned |
-| Analysis & visualization | ⬜ Planned |
-| GGUF deployment (Q4_K_M) | ⬜ Planned |
+| Build evaluation runner | ✅ Complete — 280 cells scored |
+| Merge grid (55 merged + 5 controls) | ✅ Complete — 55 PEFT + 36 sweep + 10 mergekit |
+| Analysis & visualization | ✅ Complete — CSVs, plots, FINDINGS.md |
+| GGUF deployment (Q4_K_M) | ✅ Complete — magnitude_prune quad model deployed |
 
-## Merge Methods
+## Merge Methods — Results
 
-Five weight-space merging strategies will be evaluated:
+Five weight-space merging strategies were evaluated, ranked by mean retention:
 
-1. **Linear** — weighted average of adapter parameters
-2. **TIES** — trim, elect sign, merge (resolves sign conflicts)
-3. **DARE-TIES** — drop and rescale + TIES
-4. **DARE-Linear** — drop and rescale + linear average
-5. **Magnitude Prune** — prune low-magnitude parameters before merging
+| Rank | Method | Mean Retention | Median | Worst Case |
+|------|--------|---------------|--------|------------|
+| 🥇 1 | **magnitude_prune** | **0.991** | 0.999 | 0.868 |
+| 🥈 2 | dare_ties | 0.971 | 0.992 | 0.826 |
+| 🥉 3 | linear | 0.968 | 0.995 | 0.718 |
+| 4 | dare_linear | 0.960 | 0.977 | 0.661 |
+| 5 | ties | 0.943 | 0.953 | 0.806 |
 
-Each method is applied to 11 adapter combinations (6 pairs + 4 triples + 1 quad),
-producing 55 merged models + 5 control rows (base + 4 individual adapters).
+**magnitude_prune** wins outright — highest mean, highest median, and slowest
+degradation as more tasks are added. See [FINDINGS.md](FINDINGS.md) for the full
+analysis and recommendations.
 
 ## Evaluation Metrics
 
@@ -122,6 +142,11 @@ producing 55 merged models + 5 control rows (base + 4 individual adapters).
 | JSON | Per-field F1 | Schema validation + field matching |
 
 All evaluation uses **greedy decoding** (`do_sample: false`) for reproducibility.
+
+## Dashboard
+
+Open `index.html` in a browser to view the interactive analysis dashboard with
+charts, method rankings, task fragility analysis, and recommendations.
 
 ## Reproducibility
 
