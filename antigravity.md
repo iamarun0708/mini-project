@@ -120,6 +120,22 @@ This document tracks all tasks, updates, and deliverables completed in this Anti
 
 ---
 
+### Task 7: Git Staging, Commit & Push to GitHub
+- **User Request:** Update the code to GitHub.
+- **Actions Taken:**
+  - Staged all modified and new project files:
+    - `.agents/AGENTS.md`
+    - `CLAUDE.md`
+    - `README.md`
+    - `TUTORIAL.md`
+    - `antigravity.md`
+    - `index.html`
+    - `server.py`
+  - Created commit: `feat: add interactive SLM merging studio frontend, FastAPI backend, and updated docs` (`d8e655b`).
+  - Executed `git push origin main` targeting `https://github.com/iamarun0708/mini-project.git`.
+
+---
+
 ## File Manifest of Deliverables
 - [antigravity.md](file:///c:/Users/12403/Pictures/mini-project/antigravity.md) — Cumulative activity and task log.
 - [server.py](file:///c:/Users/12403/Pictures/mini-project/server.py) — FastAPI backend server (`http://127.0.0.1:8000`).
