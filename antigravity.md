@@ -134,10 +134,25 @@ This document tracks all tasks, updates, and deliverables completed in this Anti
   - Created commit: `feat: add interactive SLM merging studio frontend, FastAPI backend, and updated docs` (`d8e655b`).
   - Executed `git push origin main` targeting `https://github.com/iamarun0708/mini-project.git`.
 
+### Task 8: Comprehensive .gitignore Configuration
+- **User Request:** Add files that need to be put in git ignore.
+- **Actions Taken:**
+  - Expanded `.gitignore` with comprehensive exclusions across:
+    - Bytecode & Python build artifacts (`__pycache__/`, `*.py[cod]`, `build/`, `dist/`, `*.egg-info/`)
+    - Virtual environments (`.venv/`, `venv/`, `env/`)
+    - Heavy model weights & checkpoints (`models/`, `adapters/`, `merged/`, `mergekit_out/`, `*.safetensors`, `*.bin`, `*.pt`, `*.pth`, `checkpoints/`)
+    - Quantized models & tools (`*.gguf`, `llama.cpp/`, `deploy/_materialized/`)
+    - Data caches (`data/processed/`, `data/raw/`, `*.parquet`, `*.arrow`, `hf_cache/`, `.cache/`)
+    - Environment variables & credentials (`.env*`, `*.pem`, `*.key`)
+    - Test & coverage artifacts (`.pytest_cache/`, `.coverage`, `htmlcov/`, `.mypy_cache/`, `.ruff_cache/`)
+    - OS & IDE files (`.DS_Store`, `Thumbs.db`, `.vscode/`, `.idea/`, `*.swp`)
+    - Agent runtime and temp folders (`.claude/`, `scratch/`, `tmp/`, `temp/`)
+
 ---
 
 ## File Manifest of Deliverables
 - [antigravity.md](file:///c:/Users/12403/Pictures/mini-project/antigravity.md) — Cumulative activity and task log.
+- [.gitignore](file:///c:/Users/12403/Pictures/mini-project/.gitignore) — Comprehensive Git ignore specification.
 - [server.py](file:///c:/Users/12403/Pictures/mini-project/server.py) — FastAPI backend server (`http://127.0.0.1:8000`).
 - [index.html](file:///c:/Users/12403/Pictures/mini-project/index.html) — Interactive 3-stage studio dashboard frontend.
 - [.agents/AGENTS.md](file:///c:/Users/12403/Pictures/mini-project/.agents/AGENTS.md) — Updated onboarding documentation.

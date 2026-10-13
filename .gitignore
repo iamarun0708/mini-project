@@ -1,11 +1,79 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Model weights, checkpoints, base models & caches
 models/
 adapters/
-data/processed/
-.venv/
-__pycache__/
-*.pyc
-*.gguf
-llama.cpp/
 merged/
 mergekit_out/
 deploy/_materialized/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+checkpoints/
+*/checkpoint-*/
+
+# GGUF / Quantized model artifacts
+*.gguf
+llama.cpp/
+
+# Processed and cached datasets
+data/processed/
+data/raw/
+*.parquet
+*.arrow
+hf_cache/
+.cache/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Testing & linting caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Logs and experiment tracking
+*.log
+wandb/
+runs/
+
+# IDE, editor & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Agent and tool runtimes / local state
+.claude/
+scratch/
+tmp/
+temp/
