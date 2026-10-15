@@ -12,21 +12,37 @@ env/
 
 # Model weights, checkpoints, base models & caches
 models/
+**/models/
 adapters/
+**/adapters/
 merged/
+**/merged/
 mergekit_out/
+**/mergekit_out/
 deploy/_materialized/
 *.safetensors
+**/*.safetensors
 *.bin
+**/*.bin
 *.pt
+**/*.pt
 *.pth
+**/*.pth
 *.onnx
+**/*.onnx
 checkpoints/
+**/checkpoints/
 */checkpoint-*/
+**/checkpoint-*/
 
 # GGUF / Quantized model artifacts
 *.gguf
+**/*.gguf
 llama.cpp/
+**/llama.cpp/
+
+# External reference skills repository
+.agents/reference-skills/
 
 # Processed and cached datasets
 data/processed/
