@@ -819,24 +819,6 @@ MODEL_ARCH_PROFILES = {
         "merge_ram_gb": 5.4,
         "is_multilingual": True,
         "architecture_type": "Sliding Window / Global Attention LM"
-    },
-    "gptx3-150m": {
-        "name": "AxiomicLabs/GPT-X3-150M",
-        "family": "GPT-X3",
-        "params": "150 Million",
-        "params_b": 0.15,
-        "layers": 24,
-        "hidden_dim": 576,
-        "heads": 9,
-        "kv_heads": 3,
-        "context_window": 8192,
-        "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-        "recommended_rank": 16,
-        "recommended_alpha": 32,
-        "train_vram_gb": 1.8,
-        "merge_ram_gb": 1.2,
-        "is_multilingual": False,
-        "architecture_type": "Gated Linear GQA Causal LM (150M)"
     }
 }
 
@@ -844,16 +826,11 @@ def resolve_model_architecture_profile(target_name: str, readiness: dict, custom
     """
     Dynamically identifies model geometry and parameter scale from predefined profiles,
     local config.json files, Hugging Face cache, or live HF Hub metadata.
-    Prevents custom models (like 150M SLMs) from erroneously defaulting to Qwen's 1.54B architecture.
     """
     low = target_name.lower().strip()
 
     # 1. Direct match against known families
-    if any(k in low for k in ["gpt-x3", "gptx3", "axiomic"]) or ("150m" in low and "gpt" in low):
-        p = MODEL_ARCH_PROFILES["gptx3-150m"].copy()
-        p["name"] = target_name
-        return "gptx3-150m", p
-    elif "llama3b" in low or ("llama" in low and "3b" in low):
+    if "llama3b" in low or ("llama" in low and "3b" in low):
         p = MODEL_ARCH_PROFILES["llama3b"].copy()
         p["name"] = target_name
         return "llama3b", p
@@ -903,7 +880,7 @@ def resolve_model_architecture_profile(target_name: str, readiness: dict, custom
                 except Exception:
                     pass
 
-    # 4. If remote Hugging Face repo (e.g. AxiomicLabs/GPT-X3-150M), fast HTTP probe
+    # 4. If remote Hugging Face repo (e.g. org/model-name), fast HTTP probe
     if not local_cfg and "/" in target_name:
         try:
             hf_url = f"https://huggingface.co/{target_name}/raw/main/config.json"
@@ -1297,7 +1274,7 @@ def predict_merge_strategy(req: PredictStrategyRequest):
             rationales.append(f"🔬 Architecture Advantage: Phi-3.5-mini has 32 dense attention heads and 32 layers. Sign-consensus voting (DARE-TIES) cleanly resolves cross-head gradient collisions, delivering peak reasoning and code retention ({round(winner_method['mean_retention']*100, 1)}%).")
         elif selected_key == "gemma2":
             rationales.append(f"🔬 Architecture Advantage: Gemma-2-2B uses Logit Soft-Capping (attention capped at 50.0). Asymmetric Coefficient Sweep avoids the severe distributional distortion caused by hard magnitude thresholding, preserving calibrated output probabilities.")
-        elif selected_key == "gptx3-150m" or params_b <= 0.3:
+        elif params_b <= 0.5:
             rationales.append(f"🔬 Ultra-Compact SLM Dynamics: {profile['name']} ({profile['params']}, D={hidden_dim}, {layers} layers) operates in a compact representation subspace. Dense linear addition causes intense parameter superposition interference. Magnitude Pruning (0.50 density) isolates dominant task deltas, protecting structured task retention while fitting easily in <2 GB VRAM.")
 
         if has_sql:
@@ -2476,19 +2453,6 @@ ALLOWED_CHAT_MODELS = {
         "artifact": "magnitude_prune__sql-math-translation-json-Q4_K_M.gguf",
         "description": "Pinned Qwen2.5-1.5B base fine-tuned across 4 specialist domains and fused with Magnitude Pruning.",
         "is_default": True
-    },
-    "gpt-x3-150m": {
-        "id": "gpt-x3-150m",
-        "name": "⚡ AxiomicLabs/GPT-X3-150M (Fine-Tuned & Merged)",
-        "short_name": "AxiomicLabs/GPT-X3-150M",
-        "model_repo": "AxiomicLabs/GPT-X3-150M",
-        "type": "finetuned_merged_slm",
-        "category": "Fine-Tuned & Merged SLM",
-        "retention": "97.8%",
-        "icon": "⚡",
-        "artifact": "gpt_x3_150m_merged.safetensors",
-        "description": "Compact 150M parameter SLM fine-tuned & weight-space merged across specialist tasks.",
-        "is_default": False
     }
 }
 
@@ -2496,7 +2460,7 @@ ALLOWED_CHAT_MODELS = {
 def get_chat_available_models():
     """
     Returns the strict whitelist of AI models that have been fine-tuned or merged by us
-    (specifically Qwen/Qwen2.5-1.5B-Instruct and AxiomicLabs/GPT-X3-150M).
+    (specifically Qwen/Qwen2.5-1.5B-Instruct).
     Raw/un-tuned foundation models are strictly disallowed.
     """
     models = list(ALLOWED_CHAT_MODELS.values())
@@ -2535,9 +2499,6 @@ def chat_completions(req: ChatCompletionsRequest):
         "qwen/qwen2.5-1.5b-instruct": "qwen2.5-1.5b-instruct",
         "qwen 2.5 1.5b": "qwen2.5-1.5b-instruct",
         "qwen2.5-1.5b": "qwen2.5-1.5b-instruct",
-        "axiomiclabs/gpt-x3-150m": "gpt-x3-150m",
-        "gpt-x3-150m": "gpt-x3-150m",
-        "gpt-x3": "gpt-x3-150m",
     }
     canonical_model = norm_map.get(requested_model.lower(), requested_model)
 

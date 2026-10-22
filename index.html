@@ -245,313 +245,6 @@
     }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
 
-    /* Animated Hamburger Menu Button (Clean Glass Capsule) */
-    .hamburger-btn {
-      width: 34px; height: 34px; border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      gap: 4px; cursor: pointer; transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      flex-shrink: 0;
-    }
-    .hamburger-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.18);
-      transform: translateY(-1px);
-    }
-    .hamburger-line {
-      width: 15px; height: 1.8px;
-      background: #e4e4e7; border-radius: 2px;
-      transition: all 0.25s ease;
-      transform-origin: center;
-    }
-    .hamburger-btn.open .line-1 {
-      transform: translateY(6px) rotate(45deg);
-      background: #fff;
-    }
-    .hamburger-btn.open .line-2 {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-    .hamburger-btn.open .line-3 {
-      transform: translateY(-6px) rotate(-45deg);
-      background: #fff;
-    }
-
-    /* ====== Frosted Glass Navigation Drawer ======
-    */
-    .drawer-backdrop {
-      position: fixed; inset: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      z-index: 998;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .drawer-backdrop.open {
-      opacity: 1; pointer-events: auto;
-    }
-
-    .glass-drawer {
-      position: fixed; top: 0; right: 0; bottom: 0;
-      width: 420px; max-width: calc(100vw - 20px);
-      background: rgba(14, 14, 18, 0.94);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border-left: 1px solid rgba(255, 255, 255, 0.09);
-      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.8);
-      z-index: 999;
-      transform: translateX(100%);
-      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex; flex-direction: column;
-      overflow-y: auto;
-    }
-    .glass-drawer.open {
-      transform: translateX(0);
-    }
-
-    .drawer-header {
-      padding: 20px 22px 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .drawer-brand { display: flex; align-items: center; gap: 10px; }
-    .drawer-logo-badge {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; color: #fff; font-weight: 900;
-    }
-    .drawer-brand-title { font-size: 15px; font-weight: 700; color: #fff; }
-    .drawer-brand-subtitle { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
-    .drawer-close-btn {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s ease;
-    }
-    .drawer-close-btn:hover {
-      background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;
-    }
-
-    .drawer-body {
-      padding: 20px 22px; flex: 1;
-    }
-    .drawer-section-label {
-      font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted);
-      text-transform: uppercase; margin-bottom: 12px;
-    }
-    .drawer-nav { display: flex; flex-direction: column; gap: 8px; }
-    .drawer-nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-radius: 10px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      color: var(--text-secondary); cursor: pointer; text-align: left;
-      transition: all 0.2s ease;
-      width: 100%; position: relative;
-    }
-    .drawer-nav-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.12);
-      color: #fff;
-    }
-    .drawer-nav-item.active {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.18);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-    }
-    .drawer-item-icon {
-      width: 36px; height: 36px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .drawer-item-content { flex: 1; min-width: 0; }
-    .drawer-item-title { font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 2px; }
-    .drawer-item-desc { font-size: 11px; color: var(--text-muted); line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .drawer-item-hotkey {
-      font-size: 10px; font-family: 'JetBrains Mono', monospace;
-      background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 2px 6px; border-radius: 4px; color: var(--text-muted);
-    }
-    .drawer-badge {
-      background: rgba(255, 255, 255, 0.1); color: #e4e4e7;
-      font-size: 10.5px; padding: 2px 7px; border-radius: 6px;
-      font-weight: 700; font-family: 'JetBrains Mono', monospace;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .drawer-footer {
-      padding: 16px 20px 22px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(10, 10, 13, 0.8);
-    }
-    .drawer-model-pill {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px; padding: 12px 14px; cursor: pointer; transition: all 0.2s ease;
-    }
-    .drawer-model-pill:hover {
-      border-color: rgba(255, 255, 255, 0.18);
-      background: rgba(255, 255, 255, 0.07);
-    }
-
-    /* ======================================================== */
-    /* STANDARD DARK MODE GLASSMORPHISM SHOWCASE DASHBOARD     */
-    /* ======================================================== */
-    .liquid-glass-showcase {
-      margin-bottom: 28px;
-      border-radius: 16px;
-      background: rgba(20, 20, 24, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      padding: 24px 28px;
-      position: relative;
-      animation: fadeIn 0.3s ease;
-    }
-    .showcase-top-row {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
-    }
-    .showcase-title-area {
-      display: flex; align-items: center; gap: 12px;
-    }
-    .showcase-glyph-badge {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: #ffffff; flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    }
-    .showcase-heading h3 {
-      font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #fff;
-      margin-bottom: 2px;
-    }
-    .showcase-heading p {
-      font-size: 12.5px; color: var(--text-secondary); max-width: 640px; margin: 0; line-height: 1.4;
-    }
-    .showcase-controls {
-      display: flex; align-items: center; gap: 8px;
-    }
-    .liquid-status-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 8px;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.22);
-      font-size: 11.5px; font-weight: 700; color: #34d399;
-      cursor: pointer; transition: all 0.2s ease;
-    }
-    .liquid-status-pill:hover {
-      background: rgba(16, 185, 129, 0.15);
-    }
-    .liquid-status-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #10b981; box-shadow: 0 0 6px #10b981;
-    }
-
-    .glass-circular-btn {
-      width: 34px; height: 34px; border-radius: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex; align-items: center; justify-content: center;
-      color: #a1a1aa; font-size: 14px; cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .glass-circular-btn:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.18);
-      color: #fff;
-    }
-
-    /* Bottom Sub-Cards Grid */
-    .showcase-metrics-grid {
-      display: grid; grid-template-columns: 260px 1fr 1.2fr; gap: 16px;
-    }
-    .showcase-subcard {
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 12px;
-      padding: 16px 18px;
-      display: flex; flex-direction: column; justify-content: space-between;
-      transition: border-color 0.2s ease;
-      backdrop-filter: blur(14px);
-    }
-    .showcase-subcard:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-    .subcard-label {
-      font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
-    }
-    .subcard-value {
-      font-size: 24px; font-weight: 900; color: #fff; font-family: 'JetBrains Mono', monospace; line-height: 1.1; margin-bottom: 10px;
-    }
-
-    .cyan-equalizer-bars {
-      display: flex; align-items: flex-end; gap: 5px; height: 32px;
-    }
-    .eq-bar {
-      flex: 1; border-radius: 3px;
-      background: linear-gradient(to top, #059669, #10b981);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
-    }
-    .eq-bar:nth-child(1) { height: 35%; }
-    .eq-bar:nth-child(2) { height: 55%; }
-    .eq-bar:nth-child(3) { height: 75%; }
-    .eq-bar:nth-child(4) { height: 90%; }
-    .eq-bar:nth-child(5) { height: 100%; }
-
-    .fluid-dynamics-row {
-      display: flex; align-items: center; gap: 14px;
-    }
-    .circular-progress-wrapper {
-      position: relative; width: 56px; height: 56px; flex-shrink: 0;
-    }
-    .circular-progress-ring {
-      width: 100%; height: 100%; border-radius: 50%;
-      background: conic-gradient(#10b981 0% 75%, rgba(255, 255, 255, 0.06) 75% 100%);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .circular-progress-ring::before {
-      content: "";
-      position: absolute; width: 42px; height: 42px; border-radius: 50%;
-      background: #141418;
-    }
-    .circular-progress-text {
-      position: relative; font-size: 13.5px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;
-    }
-    .fluid-dynamics-meta h5 {
-      font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px;
-    }
-    .fluid-dynamics-meta p {
-      font-size: 11px; color: var(--text-muted); margin: 0; line-height: 1.35;
-    }
-
-    .system-params-list {
-      display: flex; flex-direction: column; gap: 5px;
-    }
-    .param-item {
-      display: flex; align-items: center; justify-content: space-between; font-size: 11.5px;
-    }
-    .param-item-left {
-      display: flex; align-items: center; gap: 6px; color: var(--text-secondary);
-    }
-    .param-dot {
-      width: 5px; height: 5px; border-radius: 50%; background: #10b981; flex-shrink: 0;
-    }
-    .param-tag {
-      font-size: 10.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
-      padding: 1px 6px; border-radius: 4px;
-      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #e4e4e7;
-    }
-
     /* ====== Hero Banner ====== */
     .hero-banner {
       padding: 42px 0 32px;
@@ -1414,112 +1107,6 @@
 <body>
 <div class="ambient-bg"></div>
 
-<!-- Backdrop for Glass Navigation Drawer -->
-<div id="navDrawerBackdrop" class="drawer-backdrop" onclick="closeNavDrawer()"></div>
-
-<!-- Ultra-Frosted Glass Navigation Drawer -->
-<aside id="glassNavDrawer" class="glass-drawer">
-  <!-- Header -->
-  <div class="drawer-header">
-    <div class="drawer-brand">
-      <div class="drawer-logo-badge">✦</div>
-      <div>
-        <div class="drawer-brand-title">SLM Merging Studio</div>
-        <div class="drawer-brand-subtitle">Navigation &amp; Workspaces</div>
-      </div>
-    </div>
-    <button class="drawer-close-btn" onclick="closeNavDrawer()" aria-label="Close Navigation" title="Close Menu (Esc)">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-    </button>
-  </div>
-
-  <!-- Body with Navigation Items -->
-  <div class="drawer-body">
-    <div class="drawer-section-label">WORKSPACES &amp; TOOLS</div>
-    <nav class="drawer-nav">
-      <!-- 1. Studio -->
-      <button class="drawer-nav-item active" data-nav-view="studio" onclick="switchView('studio')">
-        <div class="drawer-item-icon">🛠️</div>
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Studio &amp; Workflow</div>
-          <div class="drawer-item-desc">3-step LoRA synthesis &amp; weight interpolation</div>
-        </div>
-        <span class="drawer-item-hotkey">1</span>
-      </button>
-
-      <!-- 2. Advisor -->
-      <button class="drawer-nav-item" data-nav-view="advisor" onclick="switchView('advisor')">
-        <div class="drawer-item-icon">🎯</div>
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Select &amp; Merge Advisor</div>
-          <div class="drawer-item-desc">Capacity analyzer, conflict predictor &amp; live monitor</div>
-        </div>
-        <span class="drawer-item-hotkey">2</span>
-      </button>
-
-      <!-- 3. Research -->
-      <button class="drawer-nav-item" data-nav-view="research" onclick="switchView('research')">
-        <div class="drawer-item-icon">📊</div>
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Research Charts &amp; Grid</div>
-          <div class="drawer-item-desc">280-cell evaluation grid, radar charts &amp; method compare</div>
-        </div>
-        <span class="drawer-item-hotkey">3</span>
-      </button>
-
-      <!-- 4. Playground -->
-      <button class="drawer-nav-item" data-nav-view="playground" onclick="switchView('playground')">
-        <div class="drawer-item-icon">💬</div>
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Multi-Turn Chat Studio</div>
-          <div class="drawer-item-desc">Conversational memory test across SQL, Math, Translation, JSON</div>
-        </div>
-        <span class="drawer-item-hotkey">4</span>
-      </button>
-
-      <!-- 5. Deploy -->
-      <button class="drawer-nav-item" data-nav-view="deploy" onclick="switchView('deploy')">
-        <div class="drawer-item-icon">🚀</div>
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">GGUF Deployment</div>
-          <div class="drawer-item-desc">Quantized Q4_K_M artifact specs &amp; local server</div>
-        </div>
-        <span class="drawer-item-hotkey">5</span>
-      </button>
-
-      <!-- 6. History -->
-      <button class="drawer-nav-item" data-nav-view="history" onclick="switchView('history')">
-        <div class="drawer-item-icon">📜</div>
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Runs &amp; History Archive</div>
-          <div class="drawer-item-desc">Persistent telemetry logs, tensor updates &amp; checkpoint exports</div>
-        </div>
-        <span class="drawer-badge" id="drawer-history-badge">1</span>
-      </button>
-    </nav>
-  </div>
-
-  <!-- Footer with Model Snapshot -->
-  <div class="drawer-footer">
-    <div class="drawer-model-pill" onclick="switchView('advisor')">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-        <span style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #38bdf8; letter-spacing: 0.6px;">Active Deployed Model</span>
-        <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 7px; border-radius: 4px; font-weight: 800;">ONLINE</span>
-      </div>
-      <div style="font-size: 13.5px; font-weight: 800; color: #fff; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace;" id="drawer-model-name">
-        magnitude_prune
-      </div>
-      <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
-        <span>Retention: <strong style="color: #34d399;" id="drawer-model-retention">99.1%</strong></span>
-        <span>RTX 4070 (8GB VRAM)</span>
-      </div>
-    </div>
-    <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 14px; font-family: 'JetBrains Mono', monospace;">
-      Shortcut: Press <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; color: #fff;">M</kbd> to toggle, <kbd style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; color: #fff;">Esc</kbd> to close
-    </div>
-  </div>
-</aside>
-
 <!-- Floating Ultra-Glass Sticky Header -->
 <header>
   <div class="header-inner">
@@ -1529,9 +1116,6 @@
         <span class="logo-glyph">✦</span>
       </div>
       <h1 onclick="switchView('studio')" style="cursor: pointer;">SLM Studio</h1>
-      <!-- Hidden placeholders to keep switchView JS logic functional without UI clutter -->
-      <span id="header-breadcrumb-icon" style="display: none;">🛠️</span>
-      <span id="header-breadcrumb-title" style="display: none;">Studio &amp; Workflow</span>
     </div>
 
     <!-- Center: Sleek Desktop Quick Nav Dock (Pill Bar) -->
@@ -1593,92 +1177,7 @@
       <p>Select your base model and specialist datasets, inspect the mathematical merging strategy, and immediately view real benchmark performance, task retention, and interference diagnostics.</p>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- SIGNATURE LIQUID GLASS MORPHISM SHOWCASE CARD            -->
-    <!-- Synergy of Left (3D Glass Controls) & Right (3D Orbs/UI) -->
-    <!-- ======================================================== -->
-    <div class="liquid-glass-showcase">
-      <!-- Top Title Bar -->
-      <div class="showcase-top-row">
-        <div class="showcase-title-area">
-          <div class="showcase-glyph-badge">✦</div>
-          <div class="showcase-heading">
-            <h3>Liquid Glass Morphism Architecture</h3>
-            <p>Next-generation 3D vector weight-space rendering. Experience pure holographic tensor physics and loss-less SLM multi-task synthesis.</p>
-          </div>
-        </div>
-        <div class="showcase-controls">
-          <!-- System Online Pill Badge (Right Reference Image) -->
-          <div class="liquid-status-pill" id="liquidShowcaseStatusPill" onclick="checkBackendHealth()" title="FastAPI Backend Health Status">
-            <span class="liquid-status-dot"></span>
-            <span>System Online</span>
-          </div>
-          <!-- Circular Glass Action Buttons (Left Reference Image) -->
-          <button class="glass-circular-btn" onclick="toggleNavDrawer()" title="Open Navigation Menu (M)" aria-label="Menu">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-          </button>
-          <button class="glass-circular-btn" onclick="refreshTelemetryCard()" title="Refresh Live Telemetry" aria-label="Refresh">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-          </button>
-          <button class="glass-circular-btn" onclick="switchView('advisor')" title="Merge Advisor &amp; Capacity Check" aria-label="Merge Advisor">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-          </button>
-        </div>
-      </div>
 
-      <!-- Bottom Metrics Grid -->
-      <div class="showcase-metrics-grid">
-        <!-- Card 1: Vector Quality 100% / Retention 99.1% with Cyan Equalizer Bars -->
-        <div class="showcase-subcard">
-          <div>
-            <div class="subcard-label">Vector Quality &amp; Retention</div>
-            <div class="subcard-value" id="showcase-retention-val" style="color: #38bdf8;">99.1%</div>
-          </div>
-          <div class="cyan-equalizer-bars" title="Empirical Retention Fidelity Across 4 Adapters">
-            <div class="eq-bar"></div>
-            <div class="eq-bar"></div>
-            <div class="eq-bar"></div>
-            <div class="eq-bar"></div>
-            <div class="eq-bar"></div>
-          </div>
-        </div>
-
-        <!-- Card 2: Fluid Dynamics 75% with Conic-Gradient Ring Gauge -->
-        <div class="showcase-subcard">
-          <div class="subcard-label">Fluid Dynamics &amp; Sparsity</div>
-          <div class="fluid-dynamics-row">
-            <div class="circular-progress-wrapper">
-              <div class="circular-progress-ring">
-                <span class="circular-progress-text">75%</span>
-              </div>
-            </div>
-            <div class="fluid-dynamics-meta">
-              <h5>Dynamic Prune Ratio</h5>
-              <p>75% top-magnitude weights preserved; cross-task interference suppressed.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3: System Parameters List -->
-        <div class="showcase-subcard">
-          <div class="subcard-label">System Parameters</div>
-          <div class="system-params-list">
-            <div class="param-item">
-              <div class="param-item-left"><span class="param-dot"></span><span>Rendering Engine</span></div>
-              <span class="param-tag" style="color: #34d399;">Active (RTX 4070)</span>
-            </div>
-            <div class="param-item">
-              <div class="param-item-left"><span class="param-dot"></span><span>Weight Vector Stack</span></div>
-              <span class="param-tag">LoRA (r=16, α=32)</span>
-            </div>
-            <div class="param-item">
-              <div class="param-item-left"><span class="param-dot"></span><span>Raster Degradation</span></div>
-              <span class="param-tag" style="color: #a78bfa;">Zero / Lossless</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- 3-Step Wizard Indicator -->
     <div class="wizard-steps-indicator">
@@ -1759,39 +1258,6 @@
             <span>Layers: 28 &middot; Context: 32k</span>
           </div>
           <div class="vram-tag">Fits RTX 4070 (5.3 GB VRAM with LoRA) ★★★★★</div>
-        </div>
-
-        <div class="select-card" id="select-card-llama" onclick="selectModel(this, 'llama')">
-          <span class="select-card-badge badge-ref">Candidate</span>
-          <h4>Llama-3.2-1B-Instruct</h4>
-          <div class="specs">
-            <span>Meta AI &middot; Pinned Ref</span>
-            <span>Params: 1.23B &middot; bfloat16</span>
-            <span>Context: 128k</span>
-          </div>
-          <div class="vram-tag">Fits RTX 4070 (4.6 GB VRAM)</div>
-        </div>
-
-        <div class="select-card" id="select-card-smol" onclick="selectModel(this, 'smol')">
-          <span class="select-card-badge badge-ref">Candidate</span>
-          <h4>SmolLM2-1.7B-Instruct</h4>
-          <div class="specs">
-            <span>HuggingFace TB &middot; Pinned</span>
-            <span>Params: 1.71B &middot; bfloat16</span>
-            <span>Context: 8k</span>
-          </div>
-          <div class="vram-tag">Fits RTX 4070 (5.8 GB VRAM)</div>
-        </div>
-
-        <div class="select-card" id="select-card-mistral" onclick="selectModel(this, 'mistral')">
-          <span class="select-card-badge badge-ref">Candidate</span>
-          <h4>Mistral-7B-v0.3</h4>
-          <div class="specs">
-            <span>Mistral AI &middot; 7B Scale</span>
-            <span>Params: 7.24B &middot; bfloat16</span>
-            <span>Context: 32k</span>
-          </div>
-          <div class="vram-tag" style="color: var(--accent-red);">Requires 16GB+ VRAM (OOM on 8GB)</div>
         </div>
 
         <div class="select-card" id="select-card-custom" onclick="promptCustomModel()">
@@ -2200,15 +1666,6 @@
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 8px;">🎯 Interleaved local/global attention</div>
           </div>
 
-          <div class="adv-model-item" id="adv-card-gptx3" onclick="selectAdvisorModel('gptx3')">
-            <div>
-              <div class="adv-model-badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">Ultra-Compact SLM</div>
-              <h5 style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px;">AxiomicLabs/GPT-X3-150M</h5>
-              <div style="font-size: 11px; color: var(--text-secondary);">150M params &middot; 24 layers &middot; 576 dim &middot; 8k context</div>
-            </div>
-            <div style="font-size: 11px; color: #c084fc; font-weight: 600; margin-top: 8px;">🚀 Extreme edge / IoT (&lt;1.8 GB VRAM)</div>
-          </div>
-
           <div class="adv-model-item" id="adv-card-custom" onclick="selectAdvisorCustomModel()">
             <div>
               <div class="adv-model-badge" style="background: rgba(255,255,255,0.08); color: var(--text-muted);">Custom Model</div>
@@ -2216,25 +1673,6 @@
               <div id="adv-custom-sub" style="font-size: 11px; color: var(--text-secondary);">Click to enter custom directory or repo ID</div>
             </div>
             <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 600; margin-top: 8px;">⚙️ User-specified weights</div>
-          </div>
-        </div>
-
-        <!-- Locally Available Models Dropdown -->
-        <div style="margin-top: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 12px 14px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <label for="local-models-dropdown" style="font-size: 12px; font-weight: 700; color: #93c5fd; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-              <span>💾</span> Detected Local Storage Models:
-            </label>
-            <span id="local-models-count-badge" style="font-size: 10.5px; color: #34d399; font-weight: 700; font-family: 'JetBrains Mono', monospace;">
-              Scanning...
-            </span>
-          </div>
-          <select id="local-models-dropdown" class="select-merge-method" style="width: 100%; padding: 8px 12px; font-size: 12.5px; background: rgba(22, 22, 26, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(99, 115, 155, 0.4); border-radius: 6px; color: #fff;" onchange="onLocalModelDropdownSelect(this.value)">
-            <option value="" disabled selected>Loading detected local models...</option>
-          </select>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
-            <span>📁 Scans <code>models/</code> &amp; Hugging Face cache</span>
-            <span style="color: #60a5fa; cursor: pointer; text-decoration: underline;" onclick="loadLocalModelsDropdown()">🔄 Re-Scan</span>
           </div>
         </div>
       </div>
@@ -2339,14 +1777,6 @@
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button id="btn-toggle-qwen-scope" class="btn btn-secondary" onclick="toggleResearchModelScope('qwen')" style="font-size: 12.5px; padding: 8px 14px;">
-            📁 Pinned Qwen2.5-1.5B
-          </button>
-          <button id="btn-toggle-active-scope" class="btn btn-primary" onclick="toggleResearchModelScope('active')" style="font-size: 12.5px; padding: 8px 16px; background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);">
-            🎯 Active Merged Model
-          </button>
-        </div>
       </div>
 
       <!-- Comparison Table: Prediction Values vs Actual Merged Values -->
@@ -2534,8 +1964,7 @@
             </span>
           </div>
           <select id="chat-model-select" class="select-merge-method" style="width: 100%; padding: 8px 10px; font-size: 12px; background: rgba(22, 22, 26, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(99, 115, 155, 0.4); border-radius: 6px; color: #fff; font-weight: 600;" onchange="onChatModelSelectChange(this.value)">
-            <option value="qwen2.5-1.5b-instruct">👑 Qwen/Qwen2.5-1.5B-Instruct (Fine-Tuned &amp; Merged)</option>
-            <option value="gpt-x3-150m">⚡ AxiomicLabs/GPT-X3-150M (Fine-Tuned &amp; Merged)</option>
+            <option value="qwen2.5-1.5b-instruct" selected>👑 Qwen/Qwen2.5-1.5B-Instruct (Fine-Tuned &amp; Merged)</option>
           </select>
           <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.35;">
             🛡️ <strong>Safety Restriction:</strong> Only models fine-tuned or merged by us are allowed. Raw un-tuned foundation models are blocked.
@@ -3198,11 +2627,7 @@ function switchView(viewName) {
 // Global hotkeys (1-6 for views, M to toggle menu, Esc to close)
 window.addEventListener('keydown', (e) => {
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
-  if (e.key === 'Escape') {
-    closeNavDrawer();
-  } else if (e.key === 'm' || e.key === 'M') {
-    toggleNavDrawer();
-  } else if (e.key === '1') {
+  if (e.key === '1') {
     switchView('studio');
   } else if (e.key === '2') {
     switchView('advisor');
@@ -3222,7 +2647,6 @@ let advisorSelectedModel = "qwen";
 let advisorCustomModelPath = "";
 let advisorActiveTasks = ["sql", "math", "translation", "json"];
 let advisorCurrentPrediction = null;
-let scannedLocalModelsList = [];
 
 function markAdvisorConfigDirty() {
   const btnText = document.getElementById('btn-run-prediction-text');
@@ -3288,120 +2712,6 @@ function toggleAdvisorTask(taskKey) {
   markAdvisorConfigDirty();
 }
 
-// Scans local models from project models/ directory and HF Cache
-async function loadLocalModelsDropdown() {
-  const dropdown = document.getElementById('local-models-dropdown');
-  const badge = document.getElementById('local-models-count-badge');
-  if (!dropdown) return;
-
-  if (badge) badge.innerText = "Scanning disk...";
-
-  try {
-    const res = await fetch(`${API_BASE}/models/scan_local`);
-    if (!res.ok) throw new Error("Local models scan endpoint returned error");
-    const data = await res.json();
-    scannedLocalModelsList = data.local_models || [];
-
-    if (badge) {
-      const readyCount = scannedLocalModelsList.filter(m => m.is_ready || m.size_gb > 0).length;
-      badge.innerText = `${scannedLocalModelsList.length} Detected (${readyCount} with Weights)`;
-      badge.style.color = "#34d399";
-    }
-
-    dropdown.innerHTML = '';
-    const defOpt = document.createElement('option');
-    defOpt.value = "";
-    defOpt.innerText = `-- Choose from ${scannedLocalModelsList.length} Locally Detected Models --`;
-    dropdown.appendChild(defOpt);
-
-    // Group 1: Project models/ directory
-    const projectModels = scannedLocalModelsList.filter(m => m.source && m.source.includes('Project'));
-    if (projectModels.length > 0) {
-      const grp = document.createElement('optgroup');
-      grp.label = "📁 Project models/ Directory";
-      projectModels.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.name;
-        opt.innerText = `${m.is_pinned ? '⭐ ' : ''}${m.name} (${m.size_gb > 0 ? m.size_gb + ' GB · ' : ''}${m.badge})`;
-        grp.appendChild(opt);
-      });
-      dropdown.appendChild(grp);
-    }
-
-    // Group 2: Hugging Face hub cache
-    const hfModels = scannedLocalModelsList.filter(m => m.source && m.source.includes('Hugging Face'));
-    if (hfModels.length > 0) {
-      const grp = document.createElement('optgroup');
-      grp.label = "🤗 Hugging Face Cache (~/.cache/huggingface/hub)";
-      hfModels.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.name;
-        opt.innerText = `${m.name} (${m.size_gb > 0 ? m.size_gb + ' GB · ' : ''}${m.badge})`;
-        grp.appendChild(opt);
-      });
-      dropdown.appendChild(grp);
-    }
-
-    // Restore previously selected local option
-    try {
-      const savedLocal = localStorage.getItem('slm_adv_selected_local');
-      if (savedLocal && dropdown.querySelector(`option[value="${savedLocal}"]`)) {
-        dropdown.value = savedLocal;
-      } else if (advisorSelectedModel === 'qwen') {
-        const qwenOpt = dropdown.querySelector('option[value*="qwen"]');
-        if (qwenOpt) dropdown.value = qwenOpt.value;
-      }
-    } catch (e) {}
-
-  } catch (err) {
-    console.error("Local models scan failed:", err);
-    if (badge) {
-      badge.innerText = "Scan Offline";
-      badge.style.color = "#f87171";
-    }
-  }
-}
-
-function onLocalModelDropdownSelect(selectedValue) {
-  if (!selectedValue) return;
-  try {
-    localStorage.setItem('slm_adv_selected_local', selectedValue);
-  } catch (e) {}
-
-  const matched = scannedLocalModelsList.find(m => m.name === selectedValue);
-  const low = selectedValue.toLowerCase();
-
-  if (low.includes('qwen') && (low.includes('1.5b') || low.includes('instruct'))) {
-    selectAdvisorModel('qwen');
-  } else if (low.includes('gpt-x3') || low.includes('gptx3') || low.includes('axiomic') || (low.includes('150m') && low.includes('gpt'))) {
-    selectAdvisorModel('gptx3');
-  } else if (low.includes('llama') && low.includes('1b')) {
-    selectAdvisorModel('llama1b');
-  } else if (low.includes('llama') && low.includes('3b')) {
-    selectAdvisorModel('llama3b');
-  } else if (low.includes('phi')) {
-    selectAdvisorModel('phi3');
-  } else if (low.includes('gemma')) {
-    selectAdvisorModel('gemma2');
-  } else {
-    // Custom Local Model
-    advisorSelectedModel = "custom";
-    advisorCustomModelPath = selectedValue;
-    document.querySelectorAll('.adv-model-item').forEach(c => c.classList.remove('selected'));
-    const card = document.getElementById('adv-card-custom');
-    if (card) card.classList.add('selected');
-    const title = document.getElementById('adv-custom-title');
-    if (title) title.innerText = selectedValue.split('/').pop().replace(/--/g, '/');
-    const sub = document.getElementById('adv-custom-sub');
-    if (sub) sub.innerText = `${selectedValue} ${matched && matched.size_gb > 0 ? '(' + matched.size_gb + ' GB)' : ''}`;
-    try {
-      localStorage.setItem('slm_adv_model', 'custom');
-      localStorage.setItem('slm_adv_custom_path', selectedValue);
-    } catch (e) {}
-    markAdvisorConfigDirty();
-  }
-}
-
 function restoreAdvisorStateFromStorage() {
   // 1. Restore Tasks
   try {
@@ -3438,7 +2748,7 @@ function restoreAdvisorStateFromStorage() {
       if (title) title.innerText = savedCustomPath.split('/').pop().replace(/--/g, '/');
       const sub = document.getElementById('adv-custom-sub');
       if (sub) sub.innerText = savedCustomPath;
-    } else if (savedModel && ['qwen', 'llama1b', 'llama3b', 'phi3', 'gemma2', 'gptx3'].includes(savedModel)) {
+    } else if (savedModel && ['qwen', 'llama1b', 'llama3b', 'phi3', 'gemma2'].includes(savedModel)) {
       selectAdvisorModel(savedModel);
     }
   } catch (e) {}
@@ -6700,10 +6010,10 @@ function onChatModelSelectChange(modelId) {
 function syncChatHeaderWithModel(modelId) {
   const modelObj = allowedChatModelsList.find(m => m.id === modelId) || {
     id: modelId,
-    name: modelId === 'gpt-x3-150m' ? "AxiomicLabs/GPT-X3-150M (Fine-Tuned & Merged)" : "Qwen/Qwen2.5-1.5B-Instruct (Fine-Tuned & Merged)",
-    short_name: modelId === 'gpt-x3-150m' ? "AxiomicLabs/GPT-X3-150M" : "Qwen 2.5 1.5B",
-    retention: modelId === 'gpt-x3-150m' ? "97.8%" : "99.1%",
-    icon: modelId === 'gpt-x3-150m' ? "⚡" : "👑",
+    name: "Qwen/Qwen2.5-1.5B-Instruct (Fine-Tuned & Merged)",
+    short_name: "Qwen 2.5 1.5B",
+    retention: "99.1%",
+    icon: "👑",
     description: "Fine-Tuned & Merged SLM"
   };
 
@@ -7106,9 +6416,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Fetch persistent runs and history archive
   await loadPipelineRunsHistory();
-
-  // 3. Fetch all locally available models into dropdown menu
-  await loadLocalModelsDropdown();
 
   // 4. Reconnect to any model currently getting fine-tuned or merged without hijacking active view
   await checkAndPollActivePipeline(false);
