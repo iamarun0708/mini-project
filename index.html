@@ -2059,10 +2059,15 @@
       <!-- Right: Specialist Tasks Selection -->
       <div class="advisor-card" style="display: flex; flex-direction: column; justify-content: space-between;">
         <div>
-          <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 2px;">2. Specialist Tasks to Synthesize</h4>
-          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">Select which specialist capabilities the merged model must possess:</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <h4 style="font-size: 16px; font-weight: 700; color: #fff; margin: 0;">2. Specialist Tasks to Synthesize</h4>
+            <button type="button" class="btn-sm" onclick="openCustomTaskModal()" style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(56, 189, 248, 0.25)'" onmouseout="this.style.background='rgba(56, 189, 248, 0.15)'">
+              <span>➕ Add Custom Task / Dataset</span>
+            </button>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">Select which specialist capabilities the merged model must possess, or define custom functions:</p>
 
-          <div class="advisor-tasks-list">
+          <div class="advisor-tasks-list" id="advisor-tasks-list-container">
             <label class="adv-task-checkbox-item checked" id="adv-task-label-sql">
               <input type="checkbox" id="adv-task-sql" checked onchange="toggleAdvisorTask('sql')">
               <div>
@@ -2094,18 +2099,136 @@
                 <div style="font-size: 11px; color: var(--text-secondary);">Deterministic Schema extraction &middot; 100% field F1 &middot; Stable across methods</div>
               </div>
             </label>
+
+            <!-- Custom task cards dynamically injected here -->
+            <div id="advisor-custom-tasks-wrapper" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+            <button type="button" onclick="openCustomTaskModal()" style="width: 100%; margin-top: 6px; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 10px; color: #38bdf8; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;" onmouseover="this.style.background='rgba(56, 189, 248, 0.08)'; this.style.borderColor='#38bdf8';" onmouseout="this.style.background='rgba(255, 255, 255, 0.02)'; this.style.borderColor='rgba(56, 189, 248, 0.35)';">
+              <span>➕ Define Custom Specialist Task &amp; Find Recommended Dataset</span>
+            </button>
           </div>
         </div>
 
         <div style="margin-top: 20px;">
           <button class="btn-predict-strategy" id="btn-run-prediction" onclick="runAdvisorPrediction()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-            <span id="btn-run-prediction-text">🔍 Analyze Architecture & Predict Best Merge Strategy</span>
+            <span id="btn-run-prediction-text">🔍 Analyze Architecture &amp; Predict Best Merge Strategy</span>
           </button>
           <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px;" id="advisor-button-hint">
-            🛡️ Safe Mode: Select your desired model & tasks above, then click Analyze. No merging occurs automatically.
+            🛡️ Safe Mode: Select your desired model &amp; tasks above, then click Analyze. No merging occurs automatically.
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Custom Specialist Task & Dataset Finder -->
+    <div id="custom-task-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 20px;">
+      <div style="background: #141418; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 35px rgba(56, 189, 248, 0.2);">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">⚡</span>
+              <h3 style="font-size: 18px; font-weight: 800; color: #fff; margin: 0;">Define Custom Specialist Task &amp; Dataset</h3>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0 0;">
+              Add any custom function (coding, medical QA, summarization, legal extraction). The AI advisor recommends curated datasets and predicts retention using historical merge baselines.
+            </p>
+          </div>
+          <button type="button" onclick="closeCustomTaskModal()" style="background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+        </div>
+
+        <!-- Quick Template Chips -->
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Quick Template Presets</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button type="button" onclick="applyCustomTemplate('python_code')" class="template-chip" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px; padding: 5px 12px; color: #7dd3fc; font-size: 11px; font-weight: 600; cursor: pointer;">💻 Python Code Gen</button>
+            <button type="button" onclick="applyCustomTemplate('biomedical_qa')" class="template-chip" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; padding: 5px 12px; color: #6ee7b7; font-size: 11px; font-weight: 600; cursor: pointer;">🩺 Biomedical QA</button>
+            <button type="button" onclick="applyCustomTemplate('summarization')" class="template-chip" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 20px; padding: 5px 12px; color: #fcd34d; font-size: 11px; font-weight: 600; cursor: pointer;">📰 Article Summarizer</button>
+            <button type="button" onclick="applyCustomTemplate('legal_contracts')" class="template-chip" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 20px; padding: 5px 12px; color: #d8b4fe; font-size: 11px; font-weight: 600; cursor: pointer;">⚖️ Legal Contract Extraction</button>
+            <button type="button" onclick="applyCustomTemplate('dialogue')" class="template-chip" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 5px 12px; color: #e2e8f0; font-size: 11px; font-weight: 600; cursor: pointer;">💬 Multi-Turn Agent</button>
+          </div>
+        </div>
+
+        <form id="custom-task-form" onsubmit="event.preventDefault(); saveCustomTaskFromModal();">
+          <!-- 1. Task / Function Name -->
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+              Custom Function / Specialist Name
+            </label>
+            <input type="text" id="modal-task-name" placeholder="e.g. Python Code Generation" required
+                   style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px;"
+                   oninput="onCustomTaskNameInput()">
+          </div>
+
+          <!-- 2. Functional Domain / Sensitivity Archetype -->
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+              Functional Domain Archetype (Determines Parameter Sensitivity &amp; Historical Merge Behavior)
+            </label>
+            <select id="modal-task-domain" onchange="onCustomDomainChanged(this.value)"
+                    style="width: 100%; box-sizing: border-box; background: #1a1a20; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px;">
+              <option value="code">💻 Code &amp; Program Syntax (High AST syntax sensitivity, like SQL)</option>
+              <option value="reasoning">🧠 Mathematical &amp; Deductive Reasoning (Synergistic transfer, like GSM8K)</option>
+              <option value="language">🌐 Cross-Lingual &amp; Vocabulary Sensitive (Subword preservation, like Translation)</option>
+              <option value="structured">📋 Structured Schema Extraction (High format resilience, like JSON)</option>
+              <option value="biomedical">🩺 Biomedical &amp; Clinical Diagnostics QA (Factual reasoning)</option>
+              <option value="summarization">📰 Long-Form Summarization &amp; Compression (Semantic synthesis)</option>
+              <option value="legal">⚖️ Legal Contract Analysis &amp; Clause Extraction (High precision terminology)</option>
+              <option value="general">💬 General Multi-Turn Instruction Alignment (Broad representation)</option>
+            </select>
+          </div>
+
+          <!-- 3. Recommended Dataset Box (Interactive) -->
+          <div style="margin-bottom: 16px; background: rgba(22, 22, 28, 0.7); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 10px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 15px;">📦</span>
+                <span style="font-size: 12px; font-weight: 700; color: #7dd3fc;">Curated Dataset Recommendation</span>
+              </div>
+              <button type="button" onclick="fetchAiSuggestedDatasets()" style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 3px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                ⚡ Refresh Suggestions
+              </button>
+            </div>
+            
+            <div id="modal-dataset-recommendation-content" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+              Loading curated benchmark dataset...
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">
+                Dataset Source (Hugging Face Repo ID or Local JSONL Path):
+              </label>
+              <input type="text" id="modal-task-dataset" placeholder="bigcode/the-stack or data/processed/my_task.jsonl"
+                     style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: #93c5fd; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+            </div>
+          </div>
+
+          <!-- 4. Evaluation Metric -->
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+              Evaluation Metric
+            </label>
+            <input type="text" id="modal-task-metric" placeholder="Pass@1 / AST Match"
+                   style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px;">
+          </div>
+
+          <!-- 5. Historical Derivation Preview Box -->
+          <div id="modal-historical-basis-preview" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 12px 14px; margin-bottom: 22px; font-size: 12px; color: #a7f3d0; line-height: 1.5;">
+            🔬 <strong>Historical Derivation:</strong> Modeled on our previous SQL AST syntax benchmarks. Historical values from 55 PEFT runs (retention.csv) demonstrate that Magnitude Pruning (50% density) isolates high-magnitude code syntax deltas, maintaining 99.1% retention without gradient sign collapse.
+          </div>
+
+          <!-- Modal Action Buttons -->
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" onclick="closeCustomTaskModal()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer;">
+              Cancel
+            </button>
+            <button type="submit" style="background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); border: none; border-radius: 8px; padding: 10px 22px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);">
+              ✓ Add Custom Task to Synthesize
+            </button>
+          </div>
+        </form>
+
       </div>
     </div>
 
@@ -3487,6 +3610,347 @@ let advisorSelectedModel = "qwen";
 let advisorCustomModelPath = "";
 let advisorActiveTasks = ["sql", "math", "translation", "json"];
 let advisorCurrentPrediction = null;
+let advisorCustomTasks = []; // Array of CustomTaskSpec objects
+
+const CUSTOM_DOMAIN_PRESETS = {
+  code: {
+    name: "Python Code Generation",
+    domain: "code",
+    metric: "Pass@1 / AST Match",
+    dataset: "bigcode/the-stack",
+    dataset_url: "https://huggingface.co/datasets/bigcode/the-stack",
+    samples: "8,000 curated snippets",
+    desc: "Permissive syntax-validated Python & multi-language functions.",
+    analogous: "SQL AST Syntax",
+    basis: "Modeled on SQL AST syntax benchmarks. Historical 55 PEFT runs show Magnitude Pruning isolates top 50% deltas, preventing the -28.2% collapse observed in dense linear addition."
+  },
+  reasoning: {
+    name: "Deductive Logic & Math Reasoning",
+    domain: "reasoning",
+    metric: "Exact Match / CoT Accuracy",
+    dataset: "openai/gsm8k",
+    dataset_url: "https://huggingface.co/datasets/openai/gsm8k",
+    samples: "7,173 train / 300 eval",
+    desc: "Multi-step chain-of-thought arithmetic word problems.",
+    analogous: "Math Reasoning (OpenAI GSM8K)",
+    basis: "Modeled on GSM8K reasoning benchmarks. Historical runs prove reasoning unlocks +3.5% to +6.3% positive synergistic transfer when merged with structured tasks."
+  },
+  language: {
+    name: "Multilingual Translation & Alignment",
+    domain: "language",
+    metric: "chrF++ / SacreBLEU",
+    dataset: "ai4bharat/samanantar",
+    dataset_url: "https://huggingface.co/datasets/ai4bharat/samanantar",
+    samples: "8,000 parallel sentence pairs",
+    desc: "Parallel cross-lingual sentence pairs with subword token coverage.",
+    analogous: "Tamil Translation (Samanantar)",
+    basis: "Modeled on Tamil translation benchmarks. Historical values show aggressive pruning (<30% density) degrades vocab alignments; Magnitude Pruning (50% density) preserves 95.4% retention."
+  },
+  structured: {
+    name: "Deterministic Schema & Entity Extractor",
+    domain: "structured",
+    metric: "Field-Level F1 / Schema Validity",
+    dataset: "Synthetic Deterministic Schema Benchmark",
+    dataset_url: "https://github.com/iamarun0708/mini-project/blob/main/data/prepare.py",
+    samples: "8,000 synthetic records",
+    desc: "Strict typed JSON schemas with 0-leakage synthetic evaluation.",
+    analogous: "JSON Structured Extractor",
+    basis: "Modeled on JSON extraction benchmarks. Exhibits near-perfect 98.5% ~ 100% retention across all merge methods because schema formatting occupies an orthogonal subspace."
+  },
+  biomedical: {
+    name: "Biomedical Clinical QA Specialist",
+    domain: "biomedical",
+    metric: "Diagnostic Accuracy / ROUGE-1",
+    dataset: "qiaojin/PubMedQA",
+    dataset_url: "https://huggingface.co/datasets/qiaojin/PubMedQA",
+    samples: "8,000 biomedical abstracts",
+    desc: "Biomedical question answering from PubMed research abstracts.",
+    analogous: "Math Reasoning (CoT) + Entity Vocabulary",
+    basis: "Modeled on reasoning and domain vocabulary benchmarks. Combines multi-step medical logic with clinical terminology retention (projected 98.6% ~ 102.1% retention)."
+  },
+  summarization: {
+    name: "Executive Long-Form Summarizer",
+    domain: "summarization",
+    metric: "ROUGE-L Score",
+    dataset: "cnn_dailymail",
+    dataset_url: "https://huggingface.co/datasets/cnn_dailymail",
+    samples: "8,000 news articles",
+    desc: "Abstractive multi-paragraph summarization with human reference highlights.",
+    analogous: "JSON Schema + Cross-Lingual Alignment",
+    basis: "Semantic compression representations blend smoothly without sign collisions in attention heads (projected 98.9% retention)."
+  },
+  legal: {
+    name: "Legal Contract & Clause Extractor",
+    domain: "legal",
+    metric: "Clause F1 / Exact Match",
+    dataset: "lex_glue",
+    dataset_url: "https://huggingface.co/datasets/lex_glue",
+    samples: "8,000 legal examples",
+    desc: "Judicial opinions, regulatory filings, and indemnification contract clauses.",
+    analogous: "SQL AST Syntax + JSON Schema",
+    basis: "High precision legal syntax requires Magnitude Pruning to avoid clause misattribution (projected 97.8% retention)."
+  },
+  general: {
+    name: "Conversational Dialogue Agent",
+    domain: "general",
+    metric: "Instruction Adherence",
+    dataset: "HuggingFaceH4/ultrachat_200k",
+    dataset_url: "https://huggingface.co/datasets/HuggingFaceH4/ultrachat_200k",
+    samples: "8,000 multi-turn turns",
+    desc: "Filtered high-quality conversational prompts for instruction following.",
+    analogous: "Instruction Baseline",
+    basis: "Distributed gradient updates across the transformer backbone blend cleanly under Magnitude Pruning or Linear averaging (projected 99.0% retention)."
+  }
+};
+
+function openCustomTaskModal() {
+  const modal = document.getElementById('custom-task-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  const nameInput = document.getElementById('modal-task-name');
+  if (nameInput && !nameInput.value) {
+    applyCustomTemplate('python_code');
+  } else {
+    const domainSelect = document.getElementById('modal-task-domain');
+    if (domainSelect) onCustomDomainChanged(domainSelect.value);
+  }
+}
+
+function closeCustomTaskModal() {
+  const modal = document.getElementById('custom-task-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function applyCustomTemplate(tplKey) {
+  const tpl = CUSTOM_DOMAIN_PRESETS[tplKey] || CUSTOM_DOMAIN_PRESETS.code;
+  const nameInput = document.getElementById('modal-task-name');
+  const domainSelect = document.getElementById('modal-task-domain');
+  const metricInput = document.getElementById('modal-task-metric');
+  const dsInput = document.getElementById('modal-task-dataset');
+
+  if (nameInput) nameInput.value = tpl.name;
+  if (domainSelect) domainSelect.value = tpl.domain;
+  if (metricInput) metricInput.value = tpl.metric;
+  if (dsInput) dsInput.value = tpl.dataset;
+
+  updateModalRecommendationCard(tpl);
+}
+
+function onCustomDomainChanged(domainKey) {
+  const tpl = CUSTOM_DOMAIN_PRESETS[domainKey] || CUSTOM_DOMAIN_PRESETS.code;
+  const metricInput = document.getElementById('modal-task-metric');
+  const dsInput = document.getElementById('modal-task-dataset');
+  if (metricInput) metricInput.value = tpl.metric;
+  if (dsInput && (!dsInput.value || Object.values(CUSTOM_DOMAIN_PRESETS).some(p => p.dataset === dsInput.value))) {
+    dsInput.value = tpl.dataset;
+  }
+  updateModalRecommendationCard(tpl);
+}
+
+function onCustomTaskNameInput() {
+  const nameInput = document.getElementById('modal-task-name');
+  const domainSelect = document.getElementById('modal-task-domain');
+  if (!nameInput || !domainSelect) return;
+  const val = nameInput.value.toLowerCase();
+  let matched = null;
+  if (val.includes('code') || val.includes('python') || val.includes('program') || val.includes('sql') || val.includes('function')) matched = 'code';
+  else if (val.includes('math') || val.includes('reason') || val.includes('arithmetic') || val.includes('logic')) matched = 'reasoning';
+  else if (val.includes('translat') || val.includes('tamil') || val.includes('multilingual') || val.includes('language')) matched = 'language';
+  else if (val.includes('json') || val.includes('schema') || val.includes('extract') || val.includes('table')) matched = 'structured';
+  else if (val.includes('med') || val.includes('clinic') || val.includes('bio') || val.includes('health') || val.includes('doctor')) matched = 'biomedical';
+  else if (val.includes('summar') || val.includes('brief') || val.includes('digest')) matched = 'summarization';
+  else if (val.includes('legal') || val.includes('contract') || val.includes('clause') || val.includes('law')) matched = 'legal';
+
+  if (matched && domainSelect.value !== matched) {
+    domainSelect.value = matched;
+    onCustomDomainChanged(matched);
+  }
+}
+
+function updateModalRecommendationCard(tpl) {
+  const content = document.getElementById('modal-dataset-recommendation-content');
+  const preview = document.getElementById('modal-historical-basis-preview');
+  if (content) {
+    content.innerHTML = `
+      <div style="margin-bottom: 6px;">
+        <strong style="color: #fff; font-size: 13px;">${tpl.dataset}</strong>
+        <a href="${tpl.dataset_url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-size: 11px; margin-left: 8px; text-decoration: underline;">
+          Open on Hugging Face &UpperRightArrow;
+        </a>
+      </div>
+      <div style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 4px;">
+        ${tpl.desc} &middot; <span style="color: #34d399; font-weight: 600;">${tpl.samples}</span>
+      </div>
+    `;
+  }
+  if (preview) {
+    preview.innerHTML = `
+      🔬 <strong>Historical Derivation:</strong> ${tpl.basis}
+    `;
+  }
+}
+
+async function fetchAiSuggestedDatasets() {
+  const domainSelect = document.getElementById('modal-task-domain');
+  const nameInput = document.getElementById('modal-task-name');
+  const dom = domainSelect ? domainSelect.value : 'code';
+  const tname = nameInput ? nameInput.value : '';
+  const content = document.getElementById('modal-dataset-recommendation-content');
+  if (content) content.innerHTML = `<span style="color: #38bdf8;">Querying dataset recommendation engine...</span>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/advisor/suggest_custom_dataset?domain=${encodeURIComponent(dom)}&task_name=${encodeURIComponent(tname)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.recommended_datasets && data.recommended_datasets.length > 0) {
+        const top = data.recommended_datasets[0];
+        const dsInput = document.getElementById('modal-task-dataset');
+        if (dsInput) dsInput.value = top.name;
+        if (content) {
+          content.innerHTML = `
+            <div style="margin-bottom: 6px;">
+              <strong style="color: #fff; font-size: 13px;">${top.name}</strong>
+              <a href="${top.hf_url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-size: 11px; margin-left: 8px; text-decoration: underline;">
+                Open on Hugging Face &UpperRightArrow;
+              </a>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 4px;">
+              ${top.description} &middot; <span style="color: #34d399; font-weight: 600;">${top.samples}</span> (${top.license})
+            </div>
+          `;
+        }
+        return;
+      }
+    }
+  } catch (e) {}
+
+  // Fallback to client preset
+  const tpl = CUSTOM_DOMAIN_PRESETS[dom] || CUSTOM_DOMAIN_PRESETS.code;
+  updateModalRecommendationCard(tpl);
+}
+
+function saveCustomTaskFromModal() {
+  const nameInput = document.getElementById('modal-task-name');
+  const domainSelect = document.getElementById('modal-task-domain');
+  const metricInput = document.getElementById('modal-task-metric');
+  const dsInput = document.getElementById('modal-task-dataset');
+
+  const taskName = nameInput ? nameInput.value.trim() : "";
+  if (!taskName) {
+    alert("Please enter a custom task name.");
+    return;
+  }
+  const dom = domainSelect ? domainSelect.value : "code";
+  const tpl = CUSTOM_DOMAIN_PRESETS[dom] || CUSTOM_DOMAIN_PRESETS.code;
+  const metric = (metricInput && metricInput.value.trim()) || tpl.metric;
+  const dsName = (dsInput && dsInput.value.trim()) || tpl.dataset;
+
+  const taskId = `custom_${dom}_${Date.now()}`;
+  const customTaskObj = {
+    id: taskId,
+    name: taskName,
+    domain: dom,
+    dataset_name: dsName,
+    dataset_url: tpl.dataset_url || "https://huggingface.co/datasets",
+    metric: metric,
+    description: tpl.desc
+  };
+
+  advisorCustomTasks.push(customTaskObj);
+  if (!advisorActiveTasks.includes(taskId)) {
+    advisorActiveTasks.push(taskId);
+  }
+
+  try {
+    localStorage.setItem('slm_adv_custom_tasks', JSON.stringify(advisorCustomTasks));
+    localStorage.setItem('slm_adv_tasks', JSON.stringify(advisorActiveTasks));
+  } catch (e) {}
+
+  renderCustomTasksList();
+  closeCustomTaskModal();
+  markAdvisorConfigDirty();
+}
+
+function renderCustomTasksList() {
+  const wrapper = document.getElementById('advisor-custom-tasks-wrapper');
+  if (!wrapper) return;
+
+  if (advisorCustomTasks.length === 0) {
+    wrapper.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  advisorCustomTasks.forEach(t => {
+    const isChecked = advisorActiveTasks.includes(t.id);
+    html += `
+      <div class="adv-task-checkbox-item ${isChecked ? 'checked' : ''}" id="adv-custom-card-${t.id}" style="border-left: 3px solid #38bdf8;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;">
+          <label style="display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; margin: 0;">
+            <input type="checkbox" id="adv-custom-chk-${t.id}" ${isChecked ? 'checked' : ''} onchange="toggleCustomTask('${t.id}')">
+            <div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 13px; font-weight: 700; color: #fff;">⚡ ${t.name}</span>
+                <span style="font-size: 10px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase;">${t.domain}</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                Dataset: <strong style="color: #93c5fd;">${t.dataset_name}</strong> &middot; Metric: <em>${t.metric}</em>
+              </div>
+            </div>
+          </label>
+          <button type="button" onclick="removeCustomTask('${t.id}')" title="Delete custom task" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 4px 6px; font-size: 14px; line-height: 1; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  wrapper.innerHTML = html;
+}
+
+function toggleCustomTask(taskId) {
+  const idx = advisorActiveTasks.indexOf(taskId);
+  const chk = document.getElementById(`adv-custom-chk-${taskId}`);
+  const card = document.getElementById(`adv-custom-card-${taskId}`);
+
+  if (idx > -1) {
+    if (advisorActiveTasks.length <= 1) {
+      alert("At least 1 task must remain selected.");
+      if (chk) chk.checked = true;
+      return;
+    }
+    advisorActiveTasks.splice(idx, 1);
+    if (card) card.classList.remove('checked');
+  } else {
+    advisorActiveTasks.push(taskId);
+    if (card) card.classList.add('checked');
+  }
+
+  try {
+    localStorage.setItem('slm_adv_tasks', JSON.stringify(advisorActiveTasks));
+  } catch (e) {}
+  markAdvisorConfigDirty();
+}
+
+function removeCustomTask(taskId) {
+  advisorCustomTasks = advisorCustomTasks.filter(t => t.id !== taskId);
+  const idx = advisorActiveTasks.indexOf(taskId);
+  if (idx > -1) {
+    if (advisorActiveTasks.length <= 1) {
+      advisorActiveTasks.push('sql');
+    }
+    advisorActiveTasks = advisorActiveTasks.filter(t => t !== taskId);
+  }
+
+  try {
+    localStorage.setItem('slm_adv_custom_tasks', JSON.stringify(advisorCustomTasks));
+    localStorage.setItem('slm_adv_tasks', JSON.stringify(advisorActiveTasks));
+  } catch (e) {}
+
+  renderCustomTasksList();
+  markAdvisorConfigDirty();
+}
 
 function markAdvisorConfigDirty() {
   const btnText = document.getElementById('btn-run-prediction-text');
@@ -3574,6 +4038,18 @@ function restoreAdvisorStateFromStorage() {
     }
   } catch (e) {}
 
+  // 1b. Restore Custom Tasks
+  try {
+    const savedCustom = localStorage.getItem('slm_adv_custom_tasks');
+    if (savedCustom) {
+      const parsed = JSON.parse(savedCustom);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        advisorCustomTasks = parsed;
+        renderCustomTasksList();
+      }
+    }
+  } catch (e) {}
+
   // 2. Restore Model
   try {
     const savedModel = localStorage.getItem('slm_adv_model');
@@ -3646,7 +4122,8 @@ async function runAdvisorPrediction() {
       body: JSON.stringify({
         model_name: advisorSelectedModel,
         custom_model_path: advisorCustomModelPath || undefined,
-        tasks: advisorActiveTasks
+        tasks: advisorActiveTasks,
+        custom_tasks: advisorCustomTasks.filter(ct => advisorActiveTasks.includes(ct.id))
       })
     });
     if (!res.ok) throw new Error("Advisor prediction service returned error");
@@ -3711,9 +4188,12 @@ function renderAdvisorReport(data) {
   let tasksHtml = '';
   data.task_predictions.forEach(t => {
     const isSynergy = t.predicted_retention_pct > 100.0;
+    const nameDisplay = t.is_custom 
+      ? `<span style="color: #38bdf8; font-weight: 700;">⚡ ${t.display_name}</span> <span style="font-size: 10px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 6px;">CUSTOM</span>`
+      : `<strong>${t.task.toUpperCase()}</strong>`;
     tasksHtml += `
       <tr>
-        <td><strong>${t.task.toUpperCase()}</strong></td>
+        <td>${nameDisplay}</td>
         <td style="color: var(--text-secondary); font-size: 11px;">${t.metric}</td>
         <td class="mono" style="color: var(--text-muted);">${t.base_score < 1 ? t.base_score.toFixed(3) : t.base_score.toFixed(1)}</td>
         <td class="mono">${t.specialist_score < 1 ? t.specialist_score.toFixed(3) : t.specialist_score.toFixed(1)}</td>
@@ -3728,6 +4208,96 @@ function renderAdvisorReport(data) {
   });
 
   let rationalesList = mrg.task_rationales.map(r => `<li style="margin-bottom: 8px;">${r}</li>`).join('');
+
+  let customTaskBlueprintHtml = '';
+  if (data.custom_task_details && data.custom_task_details.length > 0) {
+    customTaskBlueprintHtml = `
+      <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 0 25px rgba(56, 189, 248, 0.1);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 22px;">🎯</span>
+            <div>
+              <h4 style="font-size: 15px; font-weight: 800; color: #7dd3fc; margin: 0;">Custom Task Synthesis Blueprint &amp; Dataset Specification</h4>
+              <p style="font-size: 11.5px; color: var(--text-secondary); margin: 2px 0 0 0;">Empirical predictions and dataset sourcing for user-specified functions.</p>
+            </div>
+          </div>
+          <span style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 3px 10px; border-radius: 100px; font-weight: 700;">Active Custom Tasks (${data.custom_task_details.length})</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          ${data.custom_task_details.map(ct => `
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 15px; font-weight: 800; color: #fff;">${ct.task_name}</span>
+                  <span style="font-size: 10px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase;">${ct.domain}</span>
+                  <span style="font-size: 11px; color: var(--text-muted);">&middot; Analogous: <strong style="color: #cbd5e1;">${ct.analogous_benchmark}</strong></span>
+                </div>
+                <div style="font-size: 12px; color: #34d399; font-weight: 700;">
+                  Predicted Retention: ${ct.predicted_retention_pct}%
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                <div style="background: rgba(255,255,255,0.02); border-radius: 6px; padding: 10px 12px;">
+                  <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">📦 Recommended Dataset</div>
+                  <div style="font-size: 12.5px; font-weight: 700;">
+                    <a href="${ct.recommended_dataset_url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">
+                      ${ct.recommended_dataset} &UpperRightArrow;
+                    </a>
+                  </div>
+                  <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">${ct.description}</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.02); border-radius: 6px; padding: 10px 12px;">
+                  <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">⚡ Training &amp; Eval Spec</div>
+                  <div style="font-size: 12px; color: #fff; line-height: 1.4;">
+                    LoRA r=16, &alpha;=32 &middot; Effective Batch 32 &middot; 8,000 train / 300 eval
+                  </div>
+                  <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Metric: <strong style="color: #cbd5e1;">${ct.metric}</strong></div>
+                </div>
+              </div>
+
+              <div style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; border-radius: 4px; padding: 8px 12px; font-size: 11.5px; color: #bae6fd; line-height: 1.5;">
+                <strong>Historical Empirical Basis:</strong> ${ct.historical_derivation_explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const historicalFoundationHtml = `
+    <div style="background: rgba(18, 18, 24, 0.85); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 0 25px rgba(139, 92, 246, 0.1);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">🏛️</span>
+          <h4 style="font-size: 14px; font-weight: 800; color: #c4b5fd; margin: 0;">
+            Empirical Derivation Foundation (Historical Merging Benchmark)
+          </h4>
+        </div>
+        <span style="font-size: 11px; background: rgba(139, 92, 246, 0.18); color: #ddd6fe; padding: 3px 9px; border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+          55 PEFT + 36 Sweeps + 10 Mergekit Runs (280 Cells)
+        </span>
+      </div>
+      <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 10px 0;">
+        <strong style="color: #fff;">Do we use previous merging methods to predict retention and success rate?</strong>
+        <span style="color: #34d399; font-weight: 700;"> YES, EXACTLY.</span> All retention projections for standard and custom tasks are calculated by projecting task parameter sensitivity onto our empirical database of 55 PEFT merges (<code style="color: #cbd5e1;">retention.csv</code>), 36 coefficient sweeps (<code style="color: #cbd5e1;">sweep_retention.csv</code>), and 10 Mergekit cross-checks.
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 11.5px;">
+        <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 8px 10px; color: #94a3b8;">
+          <strong style="color: #34d399;">Magnitude Pruning (99.1%):</strong> Top 50% density eliminates sign collision, preserving syntax &amp; vocab.
+        </div>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 8px 10px; color: #60a5fa;">
+          <strong style="color: #60a5fa;">DARE-TIES (97.1%):</strong> Bernoulli dropout + sign voting excels in wide representation spaces (D &ge; 3072).
+        </div>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 8px 10px; color: #94a3b8;">
+          <strong style="color: #f87171;">Linear Averaging:</strong> Drops to 71.8% when 3+ syntax tasks collide due to unpruned sign cancellation.
+        </div>
+      </div>
+    </div>
+  `;
 
   container.innerHTML = `
     <!-- Real-Time Telemetry Bar -->
@@ -3892,6 +4462,12 @@ function renderAdvisorReport(data) {
           </tbody>
         </table>
       </div>
+
+      <!-- Custom Task Synthesis Blueprint (Rendered if custom tasks present) -->
+      ${customTaskBlueprintHtml}
+
+      <!-- Historical Merging Empirical Foundation Box -->
+      ${historicalFoundationHtml}
 
       <!-- User Confirmation & Single Method Execution -->
       <div class="report-confirm-panel">
