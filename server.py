@@ -29,6 +29,9 @@ RESULTS_DIR = BASE_DIR / "results"
 DATA_DIR = BASE_DIR / "data" / "processed"
 DEPLOY_DIR = BASE_DIR / "deploy"
 
+# Cross-Model Benchmark Arena Engine
+from arena_catalog import ARENA_PRESETS, compare_models_for_arena
+
 # System GPU Hardware Telemetry
 def get_current_gpu_info():
     if torch.cuda.is_available():
@@ -242,6 +245,12 @@ class ChatPromptRequest(BaseModel):
     prompt_index: int = 0
     custom_prompt: Optional[str] = None
     model_id: Optional[str] = "magnitude_prune__sql-math-translation-json"
+
+class ArenaCompareRequest(BaseModel):
+    task: str = "sql"
+    prompt_id: Optional[str] = None
+    prompt: Optional[str] = None
+    reference: Optional[str] = None
 
 class ChatMessage(BaseModel):
     role: str
@@ -2510,6 +2519,25 @@ def evaluate_chat_prompt(req: ChatPromptRequest):
             "critique": selected["merged_eval"]
         }
     }
+
+# ============================================================================
+# CROSS-MODEL BENCHMARK ARENA ENDPOINTS
+# ============================================================================
+
+@app.get("/api/arena/presets")
+def get_arena_presets():
+    """Returns curated benchmark presets for cross-model prompt comparison across SQL, Math, Translation, and JSON."""
+    return {"success": True, "presets": ARENA_PRESETS}
+
+@app.post("/api/arena/compare")
+def post_arena_compare(req: ArenaCompareRequest):
+    """Compares Merged Model, Dedicated Specialist, Cross-Specialist, Standalone Fine-Tuned, and Base models on the same prompt."""
+    return compare_models_for_arena(task=req.task, prompt=req.prompt, prompt_id=req.prompt_id, reference=req.reference)
+
+@app.get("/api/arena/compare")
+def get_arena_compare(task: str = Query("sql"), prompt_id: Optional[str] = Query(None)):
+    """GET convenience endpoint for arena model comparison."""
+    return compare_models_for_arena(task=task, prompt_id=prompt_id)
 
 @app.get("/api/results/matrix")
 def get_results_matrix(
