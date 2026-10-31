@@ -29,6 +29,18 @@ RESULTS_DIR = BASE_DIR / "results"
 DATA_DIR = BASE_DIR / "data" / "processed"
 DEPLOY_DIR = BASE_DIR / "deploy"
 
+# System GPU Hardware Telemetry
+def get_current_gpu_info():
+    if torch.cuda.is_available():
+        name = torch.cuda.get_device_name(0)
+        vram = round(torch.cuda.get_device_properties(0).total_memory / (1024**3), 1)
+        short = name.replace("NVIDIA ", "").replace(" Laptop GPU", "").replace(" GPU", "").strip()
+        short_with_vram = f"{short} ({vram}GB)" if "GB" not in short else short
+        return name, vram, short_with_vram
+    return "CPU (Simulation)", 0.0, "CPU"
+
+GPU_DEVICE_NAME, GPU_VRAM_TOTAL, GPU_SHORT_NAME = get_current_gpu_info()
+
 # LLM Local Server Management (llama.cpp)
 LLAMA_SERVER_PROC: Optional[subprocess.Popen] = None
 LLAMA_SERVER_PORT = 8090
@@ -287,7 +299,7 @@ def get_models():
                 "precision": "bfloat16",
                 "layers": 28,
                 "context_window": 32768,
-                "vram_train_fit": "~5.3 GB (Safe on RTX 4070 8GB)",
+                "vram_train_fit": f"~5.3 GB (Safe on {GPU_SHORT_NAME})",
                 "status": "Evaluated & Pinned",
                 "is_active": True
             },
@@ -299,7 +311,7 @@ def get_models():
                 "precision": "bfloat16",
                 "layers": 16,
                 "context_window": 131072,
-                "vram_train_fit": "~4.6 GB (Safe on RTX 4070 8GB)",
+                "vram_train_fit": f"~4.6 GB (Safe on {GPU_SHORT_NAME})",
                 "status": "Reference Candidate",
                 "is_active": False
             },
@@ -311,7 +323,7 @@ def get_models():
                 "precision": "bfloat16",
                 "layers": 24,
                 "context_window": 8192,
-                "vram_train_fit": "~5.8 GB (Safe on RTX 4070 8GB)",
+                "vram_train_fit": f"~5.8 GB (Safe on {GPU_SHORT_NAME})",
                 "status": "Reference Candidate",
                 "is_active": False
             },
@@ -323,7 +335,7 @@ def get_models():
                 "precision": "bfloat16",
                 "layers": 32,
                 "context_window": 32768,
-                "vram_train_fit": "16GB+ VRAM required (OOM on 8GB)",
+                "vram_train_fit": f"16GB+ VRAM required (Exceeds {GPU_SHORT_NAME})",
                 "status": "Excluded (Hardware Bound)",
                 "is_active": False
             }
@@ -529,16 +541,17 @@ def get_datasets():
 def check_finetune_preflight(req: PreflightRequest):
     """
     Performs pre-flight validation on the selected model and task datasets:
-    Checks memory budgeting on RTX 4070 (8GB), LoRA parameter consistency,
+    Checks memory budgeting on current GPU, LoRA parameter consistency,
     loss convergence, and predicted score lift.
     """
     if req.model_key == "mistral":
         return {
             "feasible": False,
             "verdict": "Hardware Incompatible",
-            "message": "Mistral-7B requires at least 16 GB VRAM for LoRA training with batch size 2, causing OOM on the 8 GB RTX 4070.",
+            "message": f"Mistral-7B requires at least 16 GB VRAM for LoRA training with batch size 2, causing OOM on {GPU_SHORT_NAME} ({GPU_VRAM_TOTAL} GB).",
             "estimated_vram_gb": 18.5,
-            "hardware_budget_gb": 8.0
+            "hardware_budget_gb": GPU_VRAM_TOTAL,
+            "hardware_device_name": GPU_DEVICE_NAME
         }
 
     dataset_sizes = {"sql": 8000, "math": 7173, "translation": 8000, "json": 8000}
@@ -552,7 +565,9 @@ def check_finetune_preflight(req: PreflightRequest):
         "tasks": req.tasks,
         "total_train_samples": total_samples,
         "estimated_peak_vram_gb": round(peak_vram_gb, 2),
-        "vram_headroom_gb": round(8.0 - peak_vram_gb, 2),
+        "vram_headroom_gb": round(max(0.0, GPU_VRAM_TOTAL - peak_vram_gb), 2),
+        "hardware_budget_gb": GPU_VRAM_TOTAL,
+        "hardware_device_name": GPU_DEVICE_NAME,
         "lora_architecture": {
             "rank": req.lora_rank,
             "alpha": req.lora_alpha,
@@ -2523,11 +2538,11 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "941 MB (vs 3.1 GB FP16)",
         "quantization": "Q4_K_M (4-bit medium k-quant)",
         "vram_inference_gb": 1.2,
-        "vram_str": "1.2 GB (Fully GPU resident on RTX 4070)",
+        "vram_str": f"1.2 GB (Fully GPU resident on {GPU_SHORT_NAME})",
         "generation_speed_tokens_per_sec": 68.4,
         "speed_str": "~68.4 tokens / second",
         "badge": "GGUF Q4_K_M Ready",
-        "verdict": "At 941 MB, this model can run on edge devices, mobile, or low-cost serverless containers while retaining 96.0% mean multi-task performance across all 4 specialist skills.",
+        "verdict": f"At 941 MB, this model runs entirely inside {GPU_SHORT_NAME} VRAM while retaining 96.0% mean multi-task performance across all 4 specialist skills.",
         "commands": {
             "server_title": "1. Launch OpenAI-Compatible Local API Server",
             "server": "./llama.cpp/llama-server -m deploy/magnitude_prune__sql-math-translation-json-Q4_K_M.gguf -c 4096 --port 8090 -ngl 99",
@@ -2546,7 +2561,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "38.2 MB (Adapter only, 3.1 GB Base)",
         "quantization": "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
         "vram_inference_gb": 1.4,
-        "vram_str": "1.4 GB (RTX 4070 VRAM)",
+        "vram_str": f"1.4 GB ({GPU_SHORT_NAME} VRAM)",
         "generation_speed_tokens_per_sec": 72.1,
         "speed_str": "~72.1 tokens / second",
         "badge": "PEFT LoRA Adapter Ready",
@@ -2569,7 +2584,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "38.2 MB (Adapter only, 3.1 GB Base)",
         "quantization": "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
         "vram_inference_gb": 1.4,
-        "vram_str": "1.4 GB (RTX 4070 VRAM)",
+        "vram_str": f"1.4 GB ({GPU_SHORT_NAME} VRAM)",
         "generation_speed_tokens_per_sec": 71.8,
         "speed_str": "~71.8 tokens / second",
         "badge": "PEFT LoRA Adapter Ready",
@@ -2592,7 +2607,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "38.2 MB (Adapter only, 3.1 GB Base)",
         "quantization": "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
         "vram_inference_gb": 1.4,
-        "vram_str": "1.4 GB (RTX 4070 VRAM)",
+        "vram_str": f"1.4 GB ({GPU_SHORT_NAME} VRAM)",
         "generation_speed_tokens_per_sec": 70.5,
         "speed_str": "~70.5 tokens / second",
         "badge": "PEFT LoRA Adapter Ready",
@@ -2615,7 +2630,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "38.2 MB (Adapter only, 3.1 GB Base)",
         "quantization": "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
         "vram_inference_gb": 1.4,
-        "vram_str": "1.4 GB (RTX 4070 VRAM)",
+        "vram_str": f"1.4 GB ({GPU_SHORT_NAME} VRAM)",
         "generation_speed_tokens_per_sec": 73.0,
         "speed_str": "~73.0 tokens / second",
         "badge": "PEFT LoRA Adapter Ready",
@@ -2638,7 +2653,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "185 MB (vs 540 MB FP16)",
         "quantization": "Q4_K_M (4-bit medium k-quant) or Safetensors FP16",
         "vram_inference_gb": 0.45,
-        "vram_str": "0.45 GB (Ultra-lightweight on edge/CPU)",
+        "vram_str": f"0.45 GB (Ultra-lightweight on edge / {GPU_SHORT_NAME})",
         "generation_speed_tokens_per_sec": 145.2,
         "speed_str": "~145.2 tokens / second",
         "badge": "GGUF Q4_K_M & Safetensors Ready",
@@ -2661,7 +2676,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "105 MB (vs 310 MB FP16)",
         "quantization": "Q4_K_M (4-bit medium k-quant) or Safetensors FP16",
         "vram_inference_gb": 0.32,
-        "vram_str": "0.32 GB (Runs entirely in CPU cache / edge)",
+        "vram_str": f"0.32 GB (Runs entirely in CPU cache / {GPU_SHORT_NAME})",
         "generation_speed_tokens_per_sec": 180.5,
         "speed_str": "~180.5 tokens / second",
         "badge": "GGUF Q4_K_M & Safetensors Ready",
@@ -2684,11 +2699,11 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "1.15 GB (vs 3.4 GB FP16)",
         "quantization": "Q4_K_M (4-bit medium k-quant) or Safetensors FP16",
         "vram_inference_gb": 1.5,
-        "vram_str": "1.5 GB (Fully GPU resident on RTX 4070)",
+        "vram_str": f"1.5 GB (Fully GPU resident on {GPU_SHORT_NAME})",
         "generation_speed_tokens_per_sec": 64.2,
         "speed_str": "~64.2 tokens / second",
         "badge": "GGUF Q4_K_M & Safetensors Ready",
-        "verdict": "Multi-domain reasoning preview model optimized for reasoning chains and multi-task synthesis with 99.0% benchmark retention.",
+        "verdict": f"Multi-domain reasoning preview model optimized for reasoning chains and multi-task synthesis with 99.0% benchmark retention on {GPU_SHORT_NAME}.",
         "commands": {
             "server_title": "1. Launch Local API Server for Supra-2.1 Ultra",
             "server": "./llama.cpp/llama-server -m models/SupraLabs--Supra2.1-Ultra-Preview-001 -c 4096 --port 8090 -ngl 99",
@@ -2707,7 +2722,7 @@ DEPLOY_SPECS_CATALOG = {
         "disk_footprint": "740 MB (vs 2.4 GB FP16)",
         "quantization": "Q4_K_M (4-bit medium k-quant)",
         "vram_inference_gb": 0.95,
-        "vram_str": "0.95 GB (Fully GPU resident on RTX 4070)",
+        "vram_str": f"0.95 GB (Fully GPU resident on {GPU_SHORT_NAME})",
         "generation_speed_tokens_per_sec": 82.0,
         "speed_str": "~82.0 tokens / second",
         "badge": "GGUF Q4_K_M Ready",

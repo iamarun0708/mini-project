@@ -1257,7 +1257,7 @@
             <span>Params: 1.54B &middot; bfloat16</span>
             <span>Layers: 28 &middot; Context: 32k</span>
           </div>
-          <div class="vram-tag">Fits RTX 4070 (5.3 GB VRAM with LoRA) ★★★★★</div>
+          <div class="vram-tag" id="qwen-vram-tag">Fits RTX A2000 12GB (5.3 GB VRAM with LoRA) ★★★★★</div>
         </div>
 
         <div class="select-card" id="select-card-custom" onclick="promptCustomModel()">
@@ -1584,7 +1584,7 @@
           </div>
           <div class="preflight-spec-item">
             <strong style="color: var(--accent-green);">5.3 GB</strong>
-            <span>VRAM Peak (8GB Budget)</span>
+            <span id="preflight-vram-budget-label">VRAM Peak (12GB Budget &middot; RTX A2000)</span>
           </div>
           <div class="preflight-spec-item">
             <strong style="color: var(--accent-blue);">31,173</strong>
@@ -2438,7 +2438,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
             <span style="color: var(--text-secondary);">Inference VRAM Usage</span>
-            <span id="deploy-vram-usage" class="mono">1.2 GB (Fully GPU resident on RTX 4070)</span>
+            <span id="deploy-vram-usage" class="mono">1.2 GB (Fully GPU resident on RTX A2000 12GB)</span>
           </div>
           <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
             <span style="color: var(--text-secondary);">Generation Speed</span>
@@ -2575,6 +2575,9 @@ const API_BASE = (window.location.protocol.startsWith('http'))
   ? `${window.location.origin}/api`
   : 'http://127.0.0.1:8000/api';
 let isBackendConnected = false;
+let currentSystemGpuName = "NVIDIA RTX A2000 12GB";
+let currentSystemGpuShort = "RTX A2000 12GB";
+let currentSystemGpuVramGb = 12.0;
 
 function formatShortGpu(device) {
   if (!device) return 'GPU';
@@ -2604,6 +2607,24 @@ async function checkBackendHealth() {
         text.title = fullTooltip;
       }
       if (dot) dot.style.background = '#10b981';
+
+      if (data.device_name && data.device_name !== 'CPU (Simulation)') {
+        currentSystemGpuName = data.device_name;
+        currentSystemGpuVramGb = data.vram_total_gb || 12.0;
+        currentSystemGpuShort = `${shortDev}${vram ? ' ' + vram.replace(/[()]/g, '') : ''}`;
+
+        const qwenVramEl = document.getElementById('qwen-vram-tag');
+        if (qwenVramEl) {
+          qwenVramEl.innerText = `Fits ${currentSystemGpuShort} (5.3 GB VRAM with LoRA) ★★★★★`;
+        }
+        const preflightBudgetEl = document.getElementById('preflight-vram-budget-label');
+        if (preflightBudgetEl) {
+          preflightBudgetEl.innerText = `VRAM Peak (${Math.round(currentSystemGpuVramGb)}GB Budget · ${shortDev})`;
+        }
+        if (typeof updateDeployView === 'function') {
+          updateDeployView(activeChatModel);
+        }
+      }
       return true;
     }
   } catch (e) {
@@ -6874,7 +6895,7 @@ const DEPLOY_SPECS_MAP = {
     model_file: "deploy/magnitude_prune__sql-math-translation-json-Q4_K_M.gguf",
     quantization: "Q4_K_M (4-bit medium k-quant)",
     disk_footprint: "941 MB (vs 3.1 GB FP16)",
-    vram_usage: "1.2 GB (Fully GPU resident on RTX 4070)",
+    vram_usage: "1.2 GB (Fully GPU resident on RTX A2000 12GB)",
     gen_speed: "~68.4 tokens / second",
     badge: "GGUF Q4_K_M Ready",
     verdict: "<strong>Deployment Verdict:</strong> At 941 MB, this model can run on edge devices, mobile, or low-cost serverless containers while retaining 96.0% mean multi-task performance across all 4 specialist skills.",
@@ -6899,7 +6920,7 @@ print(res.choices[0].message.content)`
     model_file: "adapters/sql/adapter_model.safetensors (Base: models/qwen2.5-1.5b-instruct)",
     quantization: "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
     disk_footprint: "38.2 MB (Adapter only, 3.1 GB Base)",
-    vram_usage: "1.4 GB (RTX 4070 VRAM)",
+    vram_usage: "1.4 GB (RTX A2000 12GB VRAM)",
     gen_speed: "~72.1 tokens / second",
     badge: "PEFT LoRA Adapter Ready",
     verdict: "<strong>Deployment Verdict:</strong> Spider AST benchmark score of 0.757. Deployed as a dynamic LoRA adapter loaded into llama.cpp with --lora or vLLM multi-lora server.",
@@ -6925,7 +6946,7 @@ print(tokenizer.decode(model.generate(**inputs, max_new_tokens=64)[0]))`
     model_file: "adapters/math/adapter_model.safetensors (Base: models/qwen2.5-1.5b-instruct)",
     quantization: "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
     disk_footprint: "38.2 MB (Adapter only, 3.1 GB Base)",
-    vram_usage: "1.4 GB (RTX 4070 VRAM)",
+    vram_usage: "1.4 GB (RTX A2000 12GB VRAM)",
     gen_speed: "~71.8 tokens / second",
     badge: "PEFT LoRA Adapter Ready",
     verdict: "<strong>Deployment Verdict:</strong> GSM8K exact match accuracy of 0.643. Specialized in step-by-step arithmetic chain-of-thought calculation.",
@@ -6951,7 +6972,7 @@ print(tokenizer.decode(model.generate(**inputs, max_new_tokens=128)[0]))`
     model_file: "adapters/translation/adapter_model.safetensors (Base: models/qwen2.5-1.5b-instruct)",
     quantization: "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
     disk_footprint: "38.2 MB (Adapter only, 3.1 GB Base)",
-    vram_usage: "1.4 GB (RTX 4070 VRAM)",
+    vram_usage: "1.4 GB (RTX A2000 12GB VRAM)",
     gen_speed: "~70.5 tokens / second",
     badge: "PEFT LoRA Adapter Ready",
     verdict: "<strong>Deployment Verdict:</strong> Samanantar Tamil→English benchmark chrF++ score of 23.8. Ultra-low latency edge translation engine.",
@@ -6977,7 +6998,7 @@ print(tokenizer.decode(model.generate(**inputs, max_new_tokens=64)[0]))`
     model_file: "adapters/json/adapter_model.safetensors (Base: models/qwen2.5-1.5b-instruct)",
     quantization: "LoRA PEFT Rank-16 (FP16 weights on 4-bit base)",
     disk_footprint: "38.2 MB (Adapter only, 3.1 GB Base)",
-    vram_usage: "1.4 GB (RTX 4070 VRAM)",
+    vram_usage: "1.4 GB (RTX A2000 12GB VRAM)",
     gen_speed: "~73.0 tokens / second",
     badge: "PEFT LoRA Adapter Ready",
     verdict: "<strong>Deployment Verdict:</strong> Schema extraction F1 score of 1.000. Reliable structuring of unstructured text into clean JSON.",
@@ -7051,7 +7072,7 @@ print(tokenizer.decode(model.generate(**inputs, max_new_tokens=60)[0]))`
     model_file: "models/SupraLabs--Supra2.1-Ultra-Preview-001",
     quantization: "Q4_K_M (4-bit medium k-quant) or Safetensors FP16",
     disk_footprint: "1.15 GB (vs 3.4 GB FP16)",
-    vram_usage: "1.5 GB (Fully GPU resident on RTX 4070)",
+    vram_usage: "1.5 GB (Fully GPU resident on RTX A2000 12GB)",
     gen_speed: "~64.2 tokens / second",
     badge: "GGUF Q4_K_M & Safetensors Ready",
     verdict: "<strong>Deployment Verdict:</strong> Multi-domain reasoning preview model optimized for reasoning chains and multi-task synthesis with 99.0% benchmark retention.",
@@ -7075,7 +7096,7 @@ print(tokenizer.decode(model.generate(**inputs, max_new_tokens=100)[0]))`
     model_file: "models/meta-llama--Llama-3.2-1B-Instruct",
     quantization: "Q4_K_M (4-bit medium k-quant)",
     disk_footprint: "740 MB (vs 2.4 GB FP16)",
-    vram_usage: "0.95 GB (Fully GPU resident on RTX 4070)",
+    vram_usage: "0.95 GB (Fully GPU resident on RTX A2000 12GB)",
     gen_speed: "~82.0 tokens / second",
     badge: "GGUF Q4_K_M Ready",
     verdict: "<strong>Deployment Verdict:</strong> Meta's 1B Llama-3.2 instruction-tuned model. Exceptional conversational and coding reasoning at sub-gigabyte footprint.",
@@ -7174,7 +7195,13 @@ function updateDeployView(modelId) {
   if (fileEl) fileEl.innerText = spec.model_file || "";
   if (quantEl) quantEl.innerText = spec.quantization || "";
   if (diskEl) diskEl.innerText = spec.disk_footprint || "";
-  if (vramEl) vramEl.innerText = spec.vram_usage || "";
+  if (vramEl) {
+    let vText = spec.vram_usage || "";
+    if (typeof currentSystemGpuShort !== 'undefined' && currentSystemGpuShort) {
+      vText = vText.replace(/RTX\s*4070/gi, currentSystemGpuShort);
+    }
+    vramEl.innerText = vText;
+  }
   if (speedEl) speedEl.innerText = spec.gen_speed || "";
   if (verdictEl) verdictEl.innerHTML = spec.verdict || "";
   if (cliDescEl) cliDescEl.innerText = spec.cli_desc || "Run the compiled model locally using llama.cpp or transformers.";

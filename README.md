@@ -32,7 +32,7 @@ q/k/v/o/gate/up/down projections — a requirement for weight-space merging.
 
 ## Hardware
 
-- **GPU**: NVIDIA GeForce RTX 4070 Laptop (8 GB VRAM)
+- **GPU**: NVIDIA RTX A2000 12GB (12 GB VRAM) (RTX 4070 Laptop compatible)
 - **Training**: batch=2, grad_accum=16, effective batch=32
 - **Training time**: ~30 min per adapter
 

@@ -16,12 +16,12 @@ model:
   dtype: bfloat16             # bf16 LoRA, NOT QLoRA — avoid quantization noise in the merge study
 
 # ---- Hardware notes --------------------------------------------------------
-# Actual GPU: RTX 4070 Laptop, 8 GB VRAM (spec assumed 12 GB).
+# Actual GPU: NVIDIA RTX A2000 12GB (12 GB VRAM).
 # Adaptation follows the spec rule: reduce batch, raise grad-accum, DO NOT switch models.
 # Effective batch is held at 32 (2 * 16) to match the spec's intent (4 * 8).
 hardware:
-  vram_gb: 8
-  gpu: "NVIDIA GeForce RTX 4070 Laptop"
+  vram_gb: 12
+  gpu: "NVIDIA RTX A2000 12GB"
 
 # ---- LoRA (identical across ALL four adapters — several merge methods need matching shapes)
 lora:

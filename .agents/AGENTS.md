@@ -12,7 +12,7 @@ weight-space methods, and measure task interference vs. transfer.
 - **Base model:** `Qwen/Qwen2.5-1.5B-Instruct`, pinned to commit
   `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`. Downloaded to `models/qwen2.5-1.5b-instruct/`.
 - **Four tasks:** `sql`, `math`, `translation` (Tamil→English), `json` (extraction).
-- **Hardware:** RTX 4070 Laptop, **8 GB VRAM**. Batch=2, grad_accum=16, effective batch=32.
+- **Hardware:** NVIDIA RTX A2000 12GB (**12 GB VRAM**; RTX 4070 Laptop compatible). Batch=2, grad_accum=16, effective batch=32.
 
 ## Single source of truth
 
