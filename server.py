@@ -298,6 +298,25 @@ def serve_index():
         raise HTTPException(status_code=404, detail="index.html not found")
     return FileResponse(index_file)
 
+@app.get("/favicon.ico", include_in_schema=False)
+def serve_favicon_ico():
+    """Serves the favicon.ico icon file."""
+    ico_file = BASE_DIR / "favicon.ico"
+    if ico_file.exists():
+        return FileResponse(ico_file, media_type="image/x-icon", headers={"Cache-Control": "public, max-age=86400"})
+    raise HTTPException(status_code=404, detail="favicon.ico not found")
+
+@app.get("/favicon.png", include_in_schema=False)
+def serve_favicon_png():
+    """Serves the favicon.png high-resolution icon file."""
+    png_file = BASE_DIR / "favicon.png"
+    if png_file.exists():
+        return FileResponse(png_file, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    ico_file = BASE_DIR / "favicon.ico"
+    if ico_file.exists():
+        return FileResponse(ico_file, media_type="image/x-icon")
+    raise HTTPException(status_code=404, detail="favicon.png not found")
+
 @app.get("/api/health")
 def get_health():
     """System health check and GPU telemetry."""

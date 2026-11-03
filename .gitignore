@@ -93,3 +93,15 @@ ehthumbs.db
 scratch/
 tmp/
 temp/
+
+# Large reference templates & local scratch inspection
+reports/*.rtf.doc
+reports/*sample*
+reports/*BACKUP*
+reports/extracted_images/
+reports/parsed_elements.json
+*_backup*
+report_assets_backup/
+scripts_inspect_*
+scripts_map_images.py
+scripts_verify_batch14_report.py
